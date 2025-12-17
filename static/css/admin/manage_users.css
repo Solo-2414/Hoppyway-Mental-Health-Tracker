@@ -1,0 +1,201 @@
+
+.manage-users-container {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    font-family: 'Newsreader', serif;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.user-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.user-controls input,
+.user-controls select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--container-bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    flex: 1 1 200px;
+}
+
+.table-card {
+    background: var(--container-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.users-table th {
+    text-align: left;
+    padding: 12px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.users-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.users-table tr:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.dark-mode .users-table tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.status.active {
+    color: green;
+    font-weight: 600;
+}
+
+.status.disabled {
+    color: red;
+    font-weight: 600;
+}
+
+.action-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.action-btn.view {
+    background: var(--primary-color);
+    color: white;
+}
+
+.action-btn.edit {
+    background: #FFA500;
+    color: white;
+}
+
+.action-btn.delete {
+    background: #FF4500;
+    color: white;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--container-bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+/* Add User Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-box {
+    background: var(--container-bg-color);
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    position: relative;
+}
+
+.modal-box h2 {
+    font-family: 'Newsreader', serif;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+.modal-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-box form label {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.modal-box form input,
+.modal-box form select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--container-bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.modal-box .close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.modal-box .btn.full {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.primary {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+

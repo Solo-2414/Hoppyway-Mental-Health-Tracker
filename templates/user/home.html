@@ -1,0 +1,259 @@
+{% extends "user/base.html" %} 
+{% block title %} Home | HoppyWay {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/user/home.css" />
+
+<div id="user-identity" data-user-id="{{ session['user_id'] }}"></div>
+
+<div class="home-dashboard">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                        <span onclick="this.parentElement.style.display='none'" style="float:right; cursor:pointer;">&times;</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="dashboard-header">
+        <h4>Overview</h4>
+        <h2>{{ greeting }}, {{ user.name }}!</h2>
+    </div>
+
+    <div class="dashboard-hero">
+        
+        <div class="re-checkin-container" style="display: none;">
+            <div class="status-card">
+                <div class="status-content">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="text-wrapper">
+                        <h3>All caught up!</h3>
+                        <p>You have checked in this <span id="current-period-text">morning</span>.</p>
+                    </div>
+                </div>
+                <button id="btn-check-in-again" class="white-btn">Check In Again</button>
+            </div>
+        </div>
+
+        <div class="emotion-container">
+            <div class="checkin-content">
+                <div class="greeting-header">
+                    <h4>Daily Tracker</h4>
+                    <h1>How are you feeling?</h1>
+                    <p>Select an emotion to log your mood for this afternoon.</p>
+                </div>
+                
+                <div class="emotions-wrapper">
+                    <div class="emotion" data-value="1">
+                        <i class="fa-solid fa-face-grin"></i>
+                        <span>Great</span>
+                    </div>
+                    <div class="emotion" data-value="2">
+                        <i class="fa-solid fa-face-smile"></i>
+                        <span>Good</span>
+                    </div>
+                    <div class="emotion" data-value="3">
+                        <i class="fa-solid fa-face-meh"></i>
+                        <span>Okay</span>
+                    </div>
+                    <div class="emotion" data-value="4">
+                        <i class="fa-solid fa-face-frown"></i>
+                        <span>Bad</span>
+                    </div>
+                    <div class="emotion" data-value="5">
+                        <i class="fa-solid fa-face-sad-cry"></i>
+                        <span>Awful</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="main-column">
+            <div class="info-card featured quote-card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fa-solid fa-quote-left"></i></div>
+                    <span>Daily Quote</span>
+                </div>
+                <div class="card-body">
+                    <h3>"{{ quote.text }}"</h3>
+                    <p>- {{ quote.author }}</p>
+                </div>
+            </div>
+            
+            <div class="info-card weekly-widget">
+                <div class="widget-header">
+                    <h3>Weekly Snapshot</h3>
+                    <a href="{{ url_for('health.health') }}">View Full Report <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                <div class="mini-weekly-chart">
+                    {% for day, data in weekly_data.items() %}
+                    <div class="day-column">
+                        <div class="bar-track">
+                            <div class="bar-fill {{ data.color_class }}" style="height: {{ data.percent|default(0, true) }}%"></div>
+                        </div>
+                        <span class="day-label">{{ day[0] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="side-column">
+            <div class="actions-stack">
+                <div class="info-card action-card" id="start-breathing-btn" style="cursor: pointer;">
+                    <div class="card-icon blue"><i class="fa-solid fa-wind"></i></div>
+                    <div class="card-content">
+                        <h3>Breathing</h3>
+                        <p>2 min exercise</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right mini-arrow"></i>
+                </div>
+                <div class="info-card action-card" id="open-journal-btn" style="cursor: pointer;">
+                    <div class="card-icon purple"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="card-content">
+                        <h3>Journal</h3>
+                        <p>Write thoughts</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right mini-arrow"></i>
+                </div>
+
+                <div class="info-card action-card" id="open-tips-btn" style="cursor: pointer;">
+                    <div class="card-icon orange"><i class="fa-solid fa-lightbulb"></i></div>
+                    <div class="card-content">
+                        <h3>Tips</h3>
+                        <p>Self-care advice</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right mini-arrow"></i>
+                </div>
+            </div>
+
+            <div class="info-card recent-logs-widget">
+                <h3>Recent Check-ins</h3>
+                <div class="logs-list">
+                    {% for log in recent_logs %}
+                    <div class="log-item">
+                        <div class="log-icon mood-{{ log.mood_value }}">
+                            {% if log.mood_value == 1 %}<i class="fa-solid fa-face-grin"></i>
+                            {% elif log.mood_value == 2 %}<i class="fa-solid fa-face-smile"></i>
+                            {% elif log.mood_value == 3 %}<i class="fa-solid fa-face-meh"></i>
+                            {% elif log.mood_value == 4 %}<i class="fa-solid fa-face-frown"></i>
+                            {% elif log.mood_value == 5 %}<i class="fa-solid fa-face-sad-cry"></i>{% endif %}
+                        </div>
+                        <div class="log-info">
+                            <span class="log-time">{{ log.created_at.strftime('%I:%M %p') }}</span>
+                            <span class="log-stress">Stress: {{ log.stress_value }}/5</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="no-logs">No check-ins yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="moodDetailModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Tell us more</h2>
+        <div class="input-group">
+            <label for="stress-slider">Stress Level: <span id="stress-display">1</span>/5</label>
+            <div class="range-wrapper">
+                <input type="range" id="stress-slider" min="1" max="5" value="1">
+            </div>
+            <div class="slider-labels">
+                <span>Low</span>
+                <span>High</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="mood-notes">Notes (Optional):</label>
+            <textarea id="mood-notes" placeholder="Why do you feel this way?"></textarea>
+        </div>
+        <button id="btn-submit-mood" class="modern-btn full-width">Submit Log</button>
+    </div>
+</div>
+
+<div id="breathingModal" class="modal-overlay">
+    <div class="modal-content breathing-content">
+        <span class="close-modal" id="close-breathing">&times;</span>
+        <h2>Relax & Breathe</h2>
+        
+        <div class="timer-display" id="breath-timer">2:00</div>
+        
+        <div class="breathing-container" id="breathing-container">
+            <div class="circle"></div>
+            <p id="breath-text">Ready?</p>
+        </div>
+
+        <div class="breath-instruction">
+            <p>Follow the circle: Expand to inhale, shrink to exhale.</p>
+        </div>
+        
+        <button class="modern-btn" id="begin-session-btn">Start Exercise</button>
+        <button class="modern-btn secondary-btn" id="stop-breathing-btn" style="display: none;">End Session</button>
+    </div>
+</div>
+<div id="journalModal" class="modal-overlay">
+    <div class="modal-content journal-content">
+        <span class="close-modal" id="close-journal">&times;</span>
+        <h2>Daily Journal</h2>
+        <p class="modal-subtitle">Clear your mind. This is private to you.</p>
+        
+        <form id="journal-form">
+            <div class="input-group">
+                <input type="text" id="journal-title" placeholder="Title (e.g., Morning Thoughts)" required>
+            </div>
+            <div class="input-group">
+                <textarea id="journal-entry" placeholder="Write whatever is on your mind..." rows="6" required></textarea>
+            </div>
+            <button type="submit" class="modern-btn full-width">Save Entry</button>
+        </form>
+    </div>
+</div>
+
+<div id="tipsModal" class="modal-overlay">
+    <div class="modal-content tips-content">
+        <span class="close-modal" id="close-tips">&times;</span>
+        
+        <div class="tips-carousel">
+            <div class="tip-slide active">
+                <div class="tip-icon"><i class="fa-solid fa-glass-water"></i></div>
+                <h3>Stay Hydrated</h3>
+                <p>Dehydration often mimics anxiety. Drink a full glass of water right now to reset your system.</p>
+            </div>
+            <div class="tip-slide">
+                <div class="tip-icon"><i class="fa-solid fa-moon"></i></div>
+                <h3>Sleep Hygiene</h3>
+                <p>Avoid screens 30 minutes before bed. Blue light suppresses melatonin and disrupts your sleep cycle.</p>
+            </div>
+            <div class="tip-slide">
+                <div class="tip-icon"><i class="fa-solid fa-person-walking"></i></div>
+                <h3>Move Your Body</h3>
+                <p>A 5-minute walk changes your physiological state and can instantly lower cortisol levels.</p>
+            </div>
+        </div>
+
+        <div class="tips-controls">
+            <button id="prev-tip" class="icon-btn"><i class="fa-solid fa-arrow-left"></i></button>
+            <div class="dots-indicator">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            <button id="next-tip" class="icon-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+</div>
+<script src="/static/js/user/home.js"></script>
+{% endblock %}

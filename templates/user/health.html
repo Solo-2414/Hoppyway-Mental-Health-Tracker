@@ -1,0 +1,113 @@
+{% extends "user/base.html" %}
+{% block title %} Health | HoppyWay {% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/user/health.css" />
+
+<div class="health-analytics">
+    
+    <div class="daily">
+        <div class="emotion-icon-wrapper">
+            <i class="fa-solid fa-face-meh"></i> 
+        </div>
+        <div class="daily-progress">
+            <h1>Daily Overview</h1>
+            <h2 id="progress-percentage">{{ daily_percentage }}%</h2>
+            
+            <div class="modern-progress-track">
+                <div class="modern-progress-fill main-gradient" style="width: {{ daily_percentage }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="time-to-time-and-weekly">
+        <div class="time-to-time">
+            <div class="time-card">
+                <div class="icon-box">
+                    <img src="/static/images/morning.png" alt="Morning" />
+                </div>
+                <div class="info-box">
+                    <div class="header-row">
+                        <h3>Morning</h3>
+                        <span>{{ morning_percentage }}%</span>
+                    </div>
+                    <div class="modern-progress-track">
+                        <div class="modern-progress-fill morning-gradient" style="width: {{ morning_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-card">
+                <div class="icon-box">
+                    <img src="/static/images/afternoon.png" alt="Afternoon" />
+                </div>
+                <div class="info-box">
+                    <div class="header-row">
+                        <h3>Afternoon</h3>
+                        <span>{{ afternoon_percentage }}%</span>
+                    </div>
+                    <div class="modern-progress-track">
+                        <div class="modern-progress-fill afternoon-gradient" style="width: {{ afternoon_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-card">
+                <div class="icon-box">
+                    <img src="/static/images/evening.png" alt="Evening" />
+                </div>
+                <div class="info-box">
+                    <div class="header-row">
+                        <h3>Evening</h3>
+                        <span>{{ evening_percentage }}%</span>
+                    </div>
+                    <div class="modern-progress-track">
+                        <div class="modern-progress-fill evening-gradient" style="width: {{ evening_percentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="weekly">
+            <h1>Weekly Activity</h1>
+            <div id="weekly-chart">
+                {% for day, data in weekly_data.items() %}
+                <div class="day-column">
+                    <div class="bar-track">
+                        <div class="bar-fill {{ data.color_class }}" style="height: {{ data.percent|default(0, true) }}%"></div>
+                    </div>
+                    <span class="day-label">{{ day }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mood-history">
+        <h1>Recent Logs & Notes</h1>
+        <div class="history-list">
+            {% for log in logs %}
+            <div class="history-item">
+                <div class="log-meta">
+                    <span class="log-date">{{ log.created_at.strftime('%b %d') }}</span>
+                    <span class="log-time">{{ log.created_at.strftime('%I:%M %p') }}</span>
+                </div>
+                <div class="log-mood mood-{{ log.mood_value }}">
+                    {% if log.mood_value == 1 %} <i class="fa-solid fa-face-grin"></i>
+                    {% elif log.mood_value == 2 %} <i class="fa-solid fa-face-smile"></i>
+                    {% elif log.mood_value == 3 %} <i class="fa-solid fa-face-meh"></i>
+                    {% elif log.mood_value == 4 %} <i class="fa-solid fa-face-frown"></i>
+                    {% elif log.mood_value == 5 %} <i class="fa-solid fa-face-sad-cry"></i>
+                    {% endif %}
+                </div>
+                <div class="log-note">
+                    {% if log.notes %} <p>“{{ log.notes }}”</p> {% else %} <p class="empty">-</p> {% endif %}
+                </div>
+                <div class="stress-badge {{ 'high' if log.stress_value > 3 else 'low' }}">
+                    Stress: {{ log.stress_value }}/5
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

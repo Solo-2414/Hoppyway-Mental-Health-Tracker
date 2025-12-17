@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}{% endblock %}</title>
+        <link
+            rel="shortcut icon"
+            href="/static/images/logo.png"
+            type="image/x-icon"
+        />
+        <script
+            src="https://kit.fontawesome.com/cfba8e65a0.js"
+            crossorigin="anonymous"
+        ></script>
+        <link rel="stylesheet" href="/static/css/admin/style.css" />
+        <script>
+            (function () {
+                try {
+                    var theme = localStorage.getItem("theme");
+                    if (theme === "dark") {
+                        document.documentElement.classList.add("dark-mode");
+                    }
+                } catch (e) {}
+            })();
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <header>
+            <div class="left-panel">
+                <i class="fas fa-bars"></i>
+                <div class="logo">
+                    <img
+                        src="/static/images/logo.svg"
+                        alt="Logo failed to load"
+                        id="logo"
+                    />
+                    <h2>Admin</h2>
+                </div>
+            </div>
+            <div class="icons">
+                <div class="notif-wrapper">
+                    <i class="fas fa-bell" id="notif-bell"></i>
+
+                    <div class="notif-dropdown" id="notif-dropdown">
+                        <div class="dropdown-arrow"></div>
+                        <h4 class="notif-title">Notifications</h4>
+                        <div class="notif-list">
+                            <div class="notif-item">
+                                <span class="notif-icon"><i class="fa-solid fa-message"></i></span>
+                                <p>You received a new message.</p>
+                            </div>
+                            <div class="notif-item">
+                                <span class="notif-icon"><i class="fa-solid fa-bell"></i></span>
+                                <p>Your daily report is ready.</p>
+                            </div>
+                        </div>
+                        <button class="notif-view-all">View All</button>
+                    </div>
+                </div>
+
+                <div class="settings-wrapper">
+                    <i class="fas fa-gear" id="settings-gear"></i>
+
+                    <div class="settings-dropdown" id="settings-dropdown">
+                        <div class="dropdown-arrow"></div>
+
+                        <button id="dark-mode-toggle">
+                            <span class="icon-circle"><i class="fa-solid fa-moon"></i></span>
+                            Dark Mode
+                        </button>
+
+                        <button class="profile-btn">
+                            <span class="icon-circle"><i class="fa-solid fa-user"></i></span>
+                            My Profile
+                        </button>
+
+                        <button class="backup-btn">
+                            <span class="icon-circle"><i class="fa-solid fa-database"></i></span>
+                            Backup & Restore
+                        </button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button class="logout-btn">
+                            <span class="icon-circle danger"><i class="fa-solid fa-right-from-bracket"></i></span>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <aside>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('admin_manage_users') }}">
+                            <i class="fas fa-users"></i><span>Users</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('admin_manage_content') }}">
+                            <i class="fas fa-folder"></i><span>Manage Contents</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('admin_announcements') }}">
+                            <i class="fas fa-bullhorn"></i><span>Announcements</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>{% block content %} {% endblock %}</main>
+
+        <footer>
+            <p>&copy; 2025 HoppyWay. All rights reserved.</p>
+        </footer>
+
+        <div id="profileModal" class="modal-overlay">
+            <div class="form-container">
+                <button class="close-btn">&times;</button>
+                <h1>Admin Profile</h1>
+                <p>Update your account details.</p>
+                
+                <form id="adminProfileForm">
+                    <div class="field">
+                        <label>Full Name</label>
+                        <input type="text" id="adminName" value="{{ user.name if user else '' }}" required />
+                    </div>
+                    <div class="field">
+                        <label>Email Address</label>
+                        <input type="email" id="adminEmail" value="{{ user.email if user else '' }}" required />
+                    </div>
+                    <div class="field">
+                        <label>New Password (Optional)</label>
+                        <input type="password" id="adminPassword" placeholder="Leave blank to keep current" />
+                    </div>
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="backupModal" class="modal-overlay">
+            <div class="form-container">
+                <button class="close-btn">&times;</button>
+                <h1>System Backup</h1>
+                <p>Manage your database safety.</p>
+
+                <div class="backup-actions">
+                    <div class="action-card">
+                        <div class="icon-wrap download"><i class="fa-solid fa-download"></i></div>
+                        <h3>Export Data</h3>
+                        <p>Download a SQL copy of the database.</p>
+                        <button id="triggerBackupBtn" class="action-btn">Download Backup</button>
+                    </div>
+
+                    <hr class="divider-text" data-content="OR">
+
+                    <div class="action-card">
+                        <div class="icon-wrap upload"><i class="fa-solid fa-upload"></i></div>
+                        <h3>Restore Data</h3>
+                        <p>Upload a SQL file to restore data.</p>
+                        <form id="restoreForm">
+                            <input type="file" id="backupFile" accept=".sql" required />
+                            <button type="submit" class="action-btn outline">Restore from File</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/js/admin/script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,69 @@
+{% extends "user/base.html" %} 
+{% block title %} Messages | HoppyWay {% endblock %} 
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/user/messages.css" />
+
+<div class="messages-container">
+    
+    <section class="contacts-section">
+        <div class="contacts-header">
+            <h2>Chats</h2>
+            <button class="new-message-btn" id="new-chat-btn" title="New Message">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+            
+            <div class="search-dropdown" id="search-dropdown">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="user-search-input" placeholder="Search people...">
+                </div>
+                <div class="search-results" id="search-results"></div>
+            </div>
+        </div>
+
+        <div class="contacts-list" id="contacts-list">
+            {% for u in conversations %}
+            <div class="contact" id="contact-{{ u.id }}" onclick="loadChat({{ u.id }}, '{{ u.name }}')">
+                <div class="avatar-circle">{{ u.name[0] }}</div>
+                <div class="contact-info">
+                    <h4>{{ u.name }}</h4>
+                </div>
+            </div>
+            {% else %}
+            <div id="no-chats-placeholder" style="text-align:center; padding:30px; color:var(--grayish-color);">
+                <p>No chats yet.</p>
+                <p style="font-size:0.9rem;">Click <b>+</b> to start!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="messages-section">
+        
+        <div class="message-header" id="chat-header" style="display:none;"> 
+            <div class="avatar-circle" id="active-user-avatar" style="width:35px; height:35px;"></div>
+            <h3 id="active-user-name" style="margin:0; font-size:1.1rem;">User</h3>
+        </div>
+
+        <div class="messages-list" id="message-display">
+            <div class="empty-state-msg">
+                <i class="fa-regular fa-paper-plane" style="font-size: 3rem; margin-bottom: 10px; opacity:0.3;"></i>
+                <p>Select a conversation or start a new one</p>
+            </div>
+        </div>
+
+        <div class="message-input-section" id="chat-window" style="display: none;">
+            <textarea id="msg-input" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+            <button class="send-message-btn" id="send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </section>
+</div>
+
+<script>
+    const MY_ID = {{ session['user_id'] }};
+</script>
+<script src="/static/js/user/messages.js"></script>
+{% endblock %}

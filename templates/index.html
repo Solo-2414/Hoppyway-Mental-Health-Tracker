@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}Home | HoppyWay{% endblock %}</title>
+
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon" />
+    </head>
+    
+    <body data-show-modal="{{ show_modal|default('') }}">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <header>
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Logo" />
+                <h2>HoppyWay</h2>
+            </div>
+            <nav>
+                <a href="">Home</a>
+                <a href="">About</a>
+                <a href="">FAQ</a>
+            </nav>
+            <div class="button">
+                <button class="login-link">Login</button>
+                <button class="sign-up">Sign Up</button>
+            </div>
+        </header>
+
+        <main>
+            {% block content %}
+            <section class="tagline">
+                <div class="tags">
+                    <h1>
+                        “There is always a chance —
+                        <span>A way to have hope and be happy.”</span>
+                    </h1>
+                    <p>
+                        Get started on your journey to happiness today. Just sign up and be
+                        part of the healthy community that HoppyWay is trying to build.
+                    </p>
+                    <button class="sign-up">Sign Up</button>
+                </div>
+                <div class="img-tagline">
+                    <img src="/static/images/tagline.png" alt="Tagline Image" />
+                </div>
+            </section>
+
+            <section class="introduction">
+                <h1>HoppyWay aims to help you, no matter what you are going through.</h1>
+                <p>
+                    HoppyWay is derived from three words:
+                    <span>Hope, Happy, and Way.</span> Each of these represents a core value
+                    that guides our mission.
+                </p>
+            </section>
+
+            <section class="aims">
+                <div class="mission">
+                    <div class="small-rectangle"></div>
+                    <h1>Mission</h1>
+                    <p>To raise awareness about mental health...</p>
+                </div>
+                <div class="vision">
+                    <div class="small-rectangle"></div>
+                    <h1>Vision</h1>
+                    <p>To create a more informed and supportive society...</p>
+                </div>
+                <div class="core-values">
+                    <div class="small-rectangle"></div>
+                    <h1>Core Values</h1>
+                    <ul>
+                        <li>Awareness</li>
+                        <li>Education</li>
+                        <li>Reflection</li>
+                        <li>Growth</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div id="signupModal" class="modal-overlay">
+                <div class="form-container">
+                    <span class="close-btn">&times;</span>
+                    <h1>Welcome to HoppyWay!</h1>
+                    <form action="/signup" method="post" class="signup-form">
+                        
+                        <div class="field">
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your name" required 
+                                   value="{{ request.form.get('name', '') }}">
+                        </div>
+
+                        <div class="field">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" name="username" placeholder="Enter your username" required
+                                   class="{% if signup_error == 'username' %}is-invalid{% endif %}"
+                                   value="{{ request.form.get('username', '') }}">
+                            {% if signup_error == 'username' %}
+                                <div class="invalid-feedback">{{ message }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required
+                                   class="{% if signup_error == 'email' %}is-invalid{% endif %}"
+                                   value="{{ request.form.get('email', '') }}">
+                            {% if signup_error == 'email' %}
+                                <div class="invalid-feedback">{{ message }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field">
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="field">
+                            <label for="confirm_password">Confirm Password:</label>
+                            <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required
+                                   class="{% if signup_error == 'confirm_password' %}is-invalid{% endif %}">
+                            {% if signup_error == 'confirm_password' %}
+                                <div class="invalid-feedback">{{ message }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" id="sign-up-btn">Sign Up</button>
+                    </form>
+                    <p>Already have an account? <span id="openSignin">Login.</span></p>
+                </div>
+            </div>
+
+            <div id="signinModal" class="modal-overlay">
+                <div class="form-container">
+                    <span class="close-btn">&times;</span>
+                    <h1>Welcome back to HoppyWay!</h1>
+                    <form action="/signin" method="post" class="signin-form">
+                        
+                        <div class="field">
+                            <label for="email_login">Email:</label>
+                            <input type="email" id="email_login" name="email" placeholder="Enter your email" required
+                                   class="{% if login_error == 'email' %}is-invalid{% endif %}"
+                                   value="{{ request.form.get('email', '') }}">
+                            {% if login_error == 'email' %}
+                                <div class="invalid-feedback">{{ message }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="field">
+                            <label for="password_login">Password:</label>
+                            <input type="password" id="password_login" name="password" placeholder="Enter your password" required
+                                   class="{% if login_error == 'password' %}is-invalid{% endif %}">
+                            {% if login_error == 'password' %}
+                                <div class="invalid-feedback">{{ message }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" id="sign-in-btn">Sign In</button>
+                    </form>
+                    <p>Don't have an account? <span id="openSignup">Sign Up.</span></p>
+                </div>
+            </div>
+            {% endblock %}
+        </main>
+
+        <footer>
+            <p>&copy; 2025 HoppyWay. All Rights Reserved.</p>
+        </footer>
+
+        <script src="https://kit.fontawesome.com/cfba8e65a0.js" crossorigin="anonymous"></script>
+        <script src="/static/js/script.js"></script>
+    </body>
+</html>

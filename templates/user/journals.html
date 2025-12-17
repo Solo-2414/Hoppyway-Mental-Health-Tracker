@@ -1,0 +1,135 @@
+{% extends "user/base.html" %}
+{% block title %} My Journals | HoppyWay {% endblock %}
+{% block content %}
+<style>
+    /* Inline styles specific to this page to keep it self-contained */
+    .journal-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+    
+    .page-header {
+        margin-bottom: 30px;
+    }
+    .page-header h2 {
+        font-family: 'Newsreader', serif;
+        font-size: 2.2rem;
+        color: var(--primary-color);
+    }
+    
+    .journal-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Reuse info-card style but adapt for list */
+    .journal-card {
+        background: var(--card-bg);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px var(--card-shadow);
+        border: 1px solid rgba(0,0,0,0.02);
+        position: relative;
+    }
+
+    .journal-date {
+        font-size: 0.85rem;
+        color: var(--grayish-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        font-weight: 700;
+        display: block;
+    }
+
+    .journal-card h3 {
+        font-size: 1.4rem;
+        color: var(--text-color);
+        margin-bottom: 15px;
+    }
+
+    .journal-card p {
+        font-size: 1rem;
+        color: var(--text-color);
+        line-height: 1.6;
+        opacity: 0.9;
+        white-space: pre-wrap; /* Preserves line breaks from your writing */
+    }
+
+    /* Delete Button */
+    .delete-form {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+    }
+    .btn-delete {
+        background: none;
+        border: none;
+        color: #ff6b6b;
+        cursor: pointer;
+        font-size: 1rem;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+    .btn-delete:hover { opacity: 1; }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+        color: var(--grayish-color);
+    }
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+</style>
+
+<div class="journal-container">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}" style="padding: 15px; background: #e3f2fd; border-radius: 10px; margin-bottom: 20px; color: #333;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+        <h4>Personal Growth</h4>
+        <h2>My Journal History</h2>
+    </div>
+
+    <div class="journal-grid">
+        {% for journal in journals %}
+        <div class="journal-card fade-in">
+            <span class="journal-date">
+                <i class="fa-regular fa-calendar"></i> &nbsp;
+                {{ journal.created_at.strftime('%B %d, %Y • %I:%M %p') }}
+            </span>
+            
+            <h3>{{ journal.title }}</h3>
+            <p>{{ journal.content }}</p>
+
+            <form action="{{ url_for('delete_journal', journal_id=journal.id) }}" method="POST" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                <button type="submit" class="btn-delete" title="Delete Entry">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-book-open"></i>
+            <h3>No entries yet</h3>
+            <p>Go to the Home dashboard to write your first journal entry!</p>
+            <a href="/home" style="color: var(--primary-color); font-weight: bold; margin-top: 10px; display: inline-block;">Go to Dashboard</a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

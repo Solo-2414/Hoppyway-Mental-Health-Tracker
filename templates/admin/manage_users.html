@@ -1,0 +1,88 @@
+{% extends 'admin/base.html' %} {% block title %}Manage Users | Admin Panel{%
+endblock %} {% block content %}
+
+<link rel="stylesheet" href="/static/css/admin/manage_users.css" />
+
+<section class="manage-users-container">
+    <div class="page-header">
+        <h1>Manage Users</h1>
+        <button id="addUserBtn" class="btn primary">+ Add User</button>
+    </div>
+
+    <div class="user-controls">
+        <input type="text" id="searchUser" placeholder="Search users..." />
+
+        <select id="filterRole">
+            <option value="all">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+        </select>
+
+        <select id="filterStatus">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="disabled">Disabled</option>
+        </select>
+    </div>
+
+    <div class="table-card">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="userTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <button id="prevPage">Previous</button>
+        <span id="pageInfo">Page 1</span>
+        <button id="nextPage">Next</button>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>Add New User</h2>
+
+            <form id="addUserForm">
+                <label>Name</label>
+                <input type="text" required />
+
+                <label>Username</label>
+                <input type="text" required />
+
+                <label>Email</label>
+                <input type="email" required />
+
+                <label>Password</label>
+                <input type="password" required />
+
+                <label>Role</label>
+                <select>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                </select>
+
+                <button type="submit" class="btn primary full">Add User</button>
+            </form>
+
+            <span class="close-modal">&times;</span>
+        </div>
+    </div>
+</section>
+
+<script src="/static/js/admin/manage_users.js"></script>
+
+{% endblock %}

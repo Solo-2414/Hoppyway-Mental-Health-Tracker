@@ -1,0 +1,119 @@
+{% extends "user/base.html" %} 
+{% block title %}Resources | HoppyWay{% endblock %} 
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/user/resources.css" />
+
+<div class="resources-wrapper">
+    <div class="resources-header">
+        <h1 class="page-title">Mental Health Resources</h1>
+        <p class="page-subtitle">
+            Curated articles, videos, and guides to support your journey.
+        </p>
+    </div>
+
+    <div class="resources-grid" id="resourcesContainer">
+        <div class="resource-card skeleton-card"></div>
+        <div class="resource-card skeleton-card"></div>
+        <div class="resource-card skeleton-card"></div>
+    </div>
+</div>
+
+<script>
+    async function loadResources() {
+        const container = document.getElementById("resourcesContainer");
+        
+        try {
+            const response = await fetch("/api/content/resources");
+            if (!response.ok) throw new Error("Failed to load resources");
+
+            const resources = await response.json();
+
+            // Clear skeletons
+            container.innerHTML = "";
+
+            if (resources.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <p>No resources available at the moment.</p>
+                    </div>`;
+                return;
+            }
+
+            resources.forEach((resource) => {
+                const card = document.createElement("div");
+                card.className = "resource-card fade-in";
+
+                // 1. Determine Media (Video or Link)
+                let mediaContent = "";
+                if (resource.media_url) {
+                    const embedUrl = getYouTubeEmbed(resource.media_url);
+                    if (embedUrl) {
+                        mediaContent = `
+                            <div class="video-wrapper">
+                                <iframe 
+                                    src="${embedUrl}" 
+                                    title="YouTube video" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                                </iframe>
+                            </div>`;
+                    }
+                }
+
+                // 2. Build Card HTML
+                card.innerHTML = `
+                    ${mediaContent}
+                    <div class="card-content">
+                        <span class="category-badge">${escapeHtml(resource.category || 'General')}</span>
+                        <h3>${escapeHtml(resource.title)}</h3>
+                        <p>${escapeHtml(resource.description)}</p>
+                        
+                        ${!mediaContent && resource.media_url ? 
+                            `<a href="${resource.media_url}" target="_blank" class="read-more">
+                                Read Article <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>` : ''}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error("Error:", error);
+            container.innerHTML = `<p class="error-msg">Failed to load resources. Please try again later.</p>`;
+        }
+    }
+
+    // Helper: Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        if (!text) return "";
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Helper: Get YouTube Embed URL
+    function getYouTubeEmbed(url) {
+        try {
+            if (!url) return null;
+            const u = new URL(url.startsWith("//") ? "https:" + url : url);
+            const host = u.hostname.toLowerCase();
+
+            if (host.includes("youtu.be")) {
+                return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+            }
+            if (host.includes("youtube.com")) {
+                if (u.pathname.startsWith("/embed/")) return u.href;
+                const v = u.searchParams.get("v");
+                if (v) return `https://www.youtube.com/embed/${v}`;
+            }
+        } catch (e) { return null; }
+        return null;
+    }
+
+    document.addEventListener("DOMContentLoaded", loadResources);
+</script>
+{% endblock %}

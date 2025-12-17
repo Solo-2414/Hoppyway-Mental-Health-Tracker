@@ -1,0 +1,318 @@
+/* --- LAYOUT & WRAPPER --- */
+.cta-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+    color: var(--text-color);
+}
+
+/* --- HERO SECTION (HOTLINES) --- */
+.hotlines-hero {
+    text-align: center;
+    padding: 60px 0 40px;
+}
+
+.hotlines-hero h1 {
+    font-family: var(--newsreader-font);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.hotlines-hero p {
+    color: var(--grayish-color);
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+}
+
+/* Hotline Cards Grid */
+.hotlines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 60px;
+}
+
+.hotline-card {
+    background: var(--container-bg-color);
+    border: 1px solid var(--border-color);
+    padding: 30px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.hotline-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+}
+
+.hotline-card .icon-box {
+    width: 60px;
+    height: 60px;
+    background: rgba(70, 94, 215, 0.1);
+    color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.hotline-card h3 {
+    font-family: var(--inter-font);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+.hotline-card .numbers {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hotline-card .numbers span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.hotline-card .sub-text {
+    font-size: 0.9rem !important;
+    color: var(--grayish-color) !important;
+    font-weight: 400 !important;
+}
+
+/* --- CONTACT SECTION (Split Layout) --- */
+.contact-container {
+    display: flex;
+    background: var(--container-bg-color);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* Left Panel */
+.contact-info-panel {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-color), #2F3C7E);
+    color: white;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative Circle Background */
+.contact-info-panel::before {
+    content: "";
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    bottom: -50px;
+    right: -50px;
+}
+
+.contact-info-panel h2 {
+    font-family: var(--newsreader-font);
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.contact-info-panel p {
+    line-height: 1.6;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1rem;
+}
+
+.info-item i {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.social-links p {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.icons-row {
+    display: flex;
+    gap: 20px;
+}
+
+.icons-row a {
+    color: white;
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+    opacity: 0.8;
+}
+
+.icons-row a:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+/* Right Panel (Form) */
+.contact-form {
+    flex: 1.5;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: var(--bg-color); /* Matches theme */
+}
+
+.contact-form h3 {
+    font-family: var(--newsreader-font);
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Modern Inputs */
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form input[type="tel"],
+.contact-form textarea {
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--container-bg-color);
+    color: var(--text-color);
+    font-family: var(--inter-font);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(70, 94, 215, 0.1);
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: var(--grayish-color);
+}
+
+.radio-label input {
+    accent-color: var(--primary-color);
+    width: 16px;
+    height: 16px;
+}
+
+/* Submit Button */
+.submit-btn {
+    margin-top: 10px;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: var(--primary-color-hover);
+    transform: translateY(-2px);
+}
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 900px) {
+    .contact-container {
+        flex-direction: column;
+    }
+    
+    .contact-info-panel {
+        padding: 40px 30px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .contact-info-panel::before {
+        display: none;
+    }
+
+    .info-list {
+        align-items: center;
+    }
+
+    .contact-form {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .hotlines-hero h1 {
+        font-size: 2rem;
+    }
+}

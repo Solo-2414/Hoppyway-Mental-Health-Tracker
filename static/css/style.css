@@ -1,0 +1,689 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #465ED7;
+    --button-color: #00FFFF;
+    --text-color: #333333;
+    --bg-color: #fcfcfc;
+    --button-hover-color: #06e7e7;
+    --grayish-color: #777777;
+    --tagline-bg-color: #f6f6f7;
+}
+
+.dark-mode {
+    --primary-color: #465ED7;
+    --button-color: #00FFFF;
+    --text-color: #FFFFFF;
+    --bg-color: #1d1d1d;
+}
+
+body {
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- HEADER --- */
+header {
+    width: 100%;
+    padding: 20px 40px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header > div,
+header > nav {
+    flex: 1;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header .logo img {
+    height: 50px;
+    width: auto;
+    mix-blend-mode: multiply;
+}
+
+header .logo h2 {
+    color: var(--primary-color);
+    font-family: 'Lato', sans-serif;
+}
+
+header nav {
+    display: flex;
+    justify-content: flex-end; /* Or center, depending on preference */
+    gap: 50px;
+}
+
+header nav a {
+    position: relative;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    text-decoration: none;
+    padding-bottom: 3px;
+}
+
+header nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+header nav a:hover::after {
+    width: 100%;
+    color: var(--primary-color);
+}
+
+/* --- HEADER BUTTONS (NEW) --- */
+header .button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Login Link Style */
+header .login-link {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+header .login-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* Sign Up Button Style */
+header .sign-up {
+    background-color: var(--button-color);
+    font-family: 'Inter', sans-serif;
+    border: none;
+    padding: 10px 20px;
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+header .sign-up:hover {
+    background-color: var(--button-hover-color);
+    transform: scale(1.05);
+}
+
+header .sign-up:active {
+    transform: scale(0.95);
+    background-color: #0ab3b3;
+}
+
+/* --- MAIN CONTENT --- */
+main {
+    flex: 1;
+}
+
+main .tagline {
+    height: 300px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tagline-bg-color);
+    box-shadow: 0 10px 12px rgba(156, 156, 156, 0.2);
+}
+
+main .tagline img {
+    height: 300px;
+}
+
+main .tagline .tags {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    padding-right: 50px;
+    padding-left: 100px;
+    gap: 20px;
+}
+
+main .tagline .tags h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.5rem;
+    font-style: italic;
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+main .tagline .tags h1 span {
+    color: var(--primary-color);
+}
+
+main .tagline .tags p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.015rem;
+    text-align: justify;
+    padding-right: 200px;
+    color: var(--grayish-color);
+}
+
+main .tagline .tags .sign-up {
+    background-color: var(--button-color);
+    font-family: 'Inter', sans-serif;
+    border: none;
+    padding: 10px 20px;
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+main .tagline .tags .sign-up:hover {
+    background-color: var(--button-hover-color);
+    transform: scale(1.05);
+}
+
+main .tagline .tags .sign-up:active {
+    transform: scale(0.95);
+    background-color: #0ab3b3;
+}
+
+/* Animation Keyframes */
+main .tagline .tags,
+main .tagline .img-tagline {
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: slideInFromLeft 2s ease forwards;
+}
+
+main .tagline .img-tagline {
+    transform: translateX(100%);
+    animation: slideInFromRight 1s ease forwards;
+    animation-delay: 0.8s;
+}
+
+@keyframes slideInFromLeft {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInFromRight {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Introduction Section */
+main .introduction {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+main .introduction h1 {
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 20px;
+}
+
+main .introduction p {
+    font-family: 'Inter', sans-serif;
+    color: var(--grayish-color);
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Aims Section */
+main .aims {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+main .aims .mission, main .aims .vision, main .aims .core-values {
+    height: 200px;
+    width: 350px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    padding-left: 50px;
+    padding-right: 50px;
+    position: relative;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+main .aims .mission h1, main .aims .vision h1, main .aims .core-values h1 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+main .aims .mission p, main .aims .vision p, main .aims .core-values ul {
+    margin-top: 30px;
+    color: var(--grayish-color);
+}
+
+main .aims .core-values ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+main .aims .mission .small-rectangle, 
+main .aims .vision .small-rectangle, 
+main .aims .core-values .small-rectangle {
+    height: 40px;
+    width: 50px;
+    border-radius: 10px 0;
+    background-color: #00FFFF;
+    z-index: -1;
+    margin: 10px auto;
+    position: absolute;
+    top: 10px;
+    right: 90px;
+    transition: transform 0.3s ease, right 0.3s ease;
+}
+
+main .aims .vision .small-rectangle { right: 100px; }
+main .aims .core-values .small-rectangle { right: 40px; }
+
+main .aims .mission:hover, main .aims .vision:hover, main .aims .core-values:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-10px);
+}
+
+main .aims .mission:active, main .aims .vision:active, main .aims .core-values:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+main .aims .mission:hover .small-rectangle { transform: translateX(-120px); }
+main .aims .vision:hover .small-rectangle { transform: translateX(-100px); }
+main .aims .core-values:hover .small-rectangle { transform: translateX(-200px); }
+
+/* --- FOOTER --- */
+footer {
+    justify-self: self-end;
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    background-color: var(--bg-color);
+    color: var(--grayish-color);
+}
+
+footer p {
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- FORMS & MODALS (Bigger & Modernized) --- */
+
+/* Modal Overlay with Blur Effect */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+/* Prevent body scroll */
+body.modal-open {
+    overflow: hidden !important;
+    height: 100vh;
+}
+
+/* Modern Card Container - BIGGER */
+.form-container {
+    width: 95%; /* Occupy most width on small screens */
+    max-width: 480px; /* Increased width for desktop */
+    background: var(--bg-color);
+    border-radius: 24px; /* Slightly rounder corners */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+    padding: 45px; /* More internal spacing */
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Animation when modal opens */
+.modal-overlay.active .form-container {
+    transform: scale(1);
+}
+
+.form-container h1 {
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 2rem; /* Slightly bigger title */
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Close Button */
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 1.6rem;
+    color: var(--grayish-color);
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    background: transparent;
+    border: none;
+    padding: 5px; /* Easier to click */
+}
+
+.close-btn:hover {
+    color: var(--error-color);
+    transform: rotate(90deg);
+}
+
+/* Form Layout */
+.form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* More space between fields */
+}
+
+.form-container form .field {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.form-container form .field label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Modern Input Styling - TALLER */
+.form-container form .field input {
+    padding: 14px 18px; /* Taller inputs for easier clicking */
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background-color: #f4f6f8;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.05rem; /* Slightly larger text */
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+/* Dark mode input adjustment */
+.dark-mode .form-container form .field input {
+    background-color: #2c2c2c;
+    color: #fff;
+}
+
+/* Input Focus State */
+.form-container form .field input:focus {
+    outline: none;
+    background-color: var(--bg-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(70, 94, 215, 0.15);
+}
+
+/* Error State */
+.form-container form .field input.is-invalid {
+    background-color: #fff2f0;
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.form-container form .field .invalid-feedback {
+    font-size: 0.85rem;
+    color: var(--error-color);
+    margin-top: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-container form .field .invalid-feedback::before {
+    content: "⚠";
+}
+
+/* Submit Button - BIGGER */
+.form-container form button {
+    margin-top: 15px;
+    padding: 16px; /* Taller button */
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.1rem; /* Larger font */
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-container form button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(70, 94, 215, 0.3);
+    background-color: var(--primary-color-hover);
+}
+
+.form-container form button:active {
+    transform: scale(0.98);
+}
+
+/* Bottom Text Link */
+.form-container p {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1rem;
+    color: var(--grayish-color);
+}
+
+.form-container p span {
+    color: var(--primary-color);
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    padding: 5px; /* Easier to click link */
+}
+
+.form-container p span::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: 0px;
+    left: 0;
+    background-color: var(--primary-color);
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+
+.form-container p span:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ============================
+   RESPONSIVE DESIGN FIXES
+   ============================ */
+
+/* Large Tablets / Small Laptops */
+@media (max-width: 1200px) {
+    main .tagline .tags p {
+        padding-right: 100px;
+    }
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+    header nav {
+        gap: 25px;
+    }
+
+    main .tagline {
+        flex-direction: column;
+        height: auto;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    main .tagline .tags {
+        align-items: center;
+        padding: 0 40px;
+        text-align: center;
+    }
+
+    main .tagline .tags p {
+        padding-right: 0;
+    }
+
+    main .tagline img {
+        height: 220px;
+        margin-top: 20px;
+    }
+
+    main .aims {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-container {
+        width: 70vw;
+    }
+}
+
+/* Small Tablets / Large Phones */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    header nav {
+        justify-content: center;
+        gap: 20px;
+    }
+
+    main .tagline h1 {
+        font-size: 2rem;
+    }
+
+    main .tagline .tags {
+        padding: 0 20px;
+    }
+
+    main .introduction p {
+        padding: 0 20px;
+    }
+
+    .form-container {
+        width: 85vw;
+    }
+}
+
+/* Mobile Phones */
+@media (max-width: 576px) {
+    header nav {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    main .tagline {
+        padding: 20px 10px;
+    }
+
+    main .tagline .tags h1 {
+        font-size: 1.6rem;
+    }
+
+    main .tagline img {
+        height: 180px;
+    }
+
+    main .aims .mission,
+    main .aims .vision,
+    main .aims .core-values {
+        width: 90%;
+        padding: 20px;
+        height: auto;
+    }
+
+    main .aims .small-rectangle {
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .form-container {
+        width: 95vw;
+    }
+}
+
+/* Small Mobile Phones */
+@media (max-width: 400px) {
+    header .logo h2 {
+        font-size: 1.2rem;
+    }
+
+    main .tagline .tags h1 {
+        font-size: 1.4rem;
+    }
+
+    main .tagline img {
+        height: 150px;
+    }
+}

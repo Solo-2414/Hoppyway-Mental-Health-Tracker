@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}{% endblock %}</title>
+        
+        <script>
+            (function () {
+                try {
+                    var theme = localStorage.getItem("theme");
+                    if (theme === "dark") {
+                        document.documentElement.classList.add("dark-mode");
+                    }
+                } catch (e) {}
+            })();
+        </script>
+
+        <link rel="stylesheet" href="/static/css/user/style.css" />
+        <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon" />
+        <script src="https://kit.fontawesome.com/cfba8e65a0.js" crossorigin="anonymous"></script>
+    </head>
+    
+    <body>
+        <header>
+            <div class="left-panel">
+                <i class="fas fa-bars"></i>
+                <div class="logo">
+                    <img src="/static/images/logo.svg" alt="Logo" id="logo" />
+                    <h2>HoppyWay</h2>
+                </div>
+            </div>
+
+            <div class="icons">
+                <i class="fas fa-user" id="user-icon-btn" style="cursor: pointer;"></i>
+
+                <div class="notif-wrapper">
+                    <i class="fas fa-bell" id="notif-bell"></i>
+
+                    {% if notif_unread_count > 0 %}
+                        <span class="notif-badge">{{ notif_unread_count }}</span>
+                    {% endif %}
+
+                    <div class="notif-dropdown" id="notif-dropdown">
+                        <div class="dropdown-arrow"></div>
+                        <h4 class="notif-title">Notifications</h4>
+                        
+                        <div class="notif-list">
+                            {% if notifications and notifications|length > 0 %}
+                                {% for n in notifications %}
+                                <div class="notif-item" onclick="window.location.href='/notifications'">
+                                    <span class="notif-icon"><i class="fa-solid fa-circle-info"></i></span>
+                                    <div class="notif-content">
+                                        <p>{{ n.message }}</p>
+                                        <span class="notif-meta">{{ n.created_at.strftime('%b %d, %I:%M %p') }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="notif-empty"><p>No new notifications</p></div>
+                            {% endif %}
+                        </div>
+                        <button class="notif-view-all">View All</button>
+                    </div>
+                </div>
+
+                <div class="settings-wrapper">
+                    <i class="fas fa-gear" id="settings-gear"></i>
+
+                    <div class="settings-dropdown" id="settings-dropdown">
+                        <div class="dropdown-arrow"></div>
+
+                        <div class="dropdown-profile">
+                            <i class="fa-solid fa-circle-user" style="font-size: 30px"></i>
+                            <div><h4>{{ user.name if user else "Guest" }}</h4></div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button id="dark-mode-toggle">
+                            <span class="icon-circle"><i class="fa-solid fa-moon"></i></span>
+                            Dark Mode
+                        </button>
+
+                        <button class="edit-profile-btn">
+                            <span class="icon-circle"><i class="fa-solid fa-user-pen"></i></span>
+                            Edit Profile
+                        </button>
+
+                        <div class="dropdown-divider"></div>
+
+                        <button class="logout-btn">
+                            <span class="icon-circle danger"><i class="fa-solid fa-right-from-bracket"></i></span>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <aside>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('home') }}" class="{% if active_page == 'home' %}active{% endif %}">
+                            <i class="fas fa-home"></i><span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('health.health') }}" class="{% if active_page == 'health' %}active{% endif %}">
+                            <i class="fa-solid fa-briefcase-medical"></i><span>Health</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('messages') }}" class="{% if active_page == 'messages' %}active{% endif %}">
+                            <i class="fa-solid fa-message"></i><span>Messages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('my_journals') }}" class="{% if active_page == 'journals' %}active{% endif %}">
+                            <i class="fa-solid fa-book-journal-whills"></i><span>Journals</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('resources') }}" class="{% if active_page == 'resources' %}active{% endif %}">
+                            <i class="fa-solid fa-book"></i><span>Resources</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('call_to_action') }}" class="{% if active_page == 'call_to_action' %}active{% endif %}">
+                            <i class="fa-solid fa-square-phone"></i><span>Call to Action</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('information') }}" class="{% if active_page == 'information' %}active{% endif %}">
+                            <i class="fa-solid fa-circle-info"></i><span>Information</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('faqs') }}" class="{% if active_page == 'faqs' %}active{% endif %}">
+                            <i class="fa-solid fa-question-circle"></i><span>FAQs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>{% block content %}{% endblock %}</main>
+
+        <footer>
+            <p>&copy; 2025 HoppyWay. All Rights Reserved.</p>
+        </footer>
+
+        <div id="editProfileModal" class="modal-overlay">
+            <div class="form-container">
+                <button class="close-btn">&times;</button>
+                <h1>Edit Profile</h1>
+                <p style="margin-bottom: 20px;">Update your personal details.</p>
+                
+                <form id="editProfileForm">
+                    <div class="field">
+                        <label for="editName">Full Name</label>
+                        <input type="text" id="editName" value="{{ user.name }}" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="editUsername">Username</label>
+                        <input type="text" id="editUsername" value="{{ user.username }}" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="editEmail">Email Address</label>
+                        <input type="email" id="editEmail" value="{{ user.email }}" required />
+                    </div>
+
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>        
+
+        <script src="/static/js/user/script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,360 @@
+/* ============================
+   HEALTH ANALYTICS STYLES
+   ============================ */
+
+/* --- RESET / BASE --- */
+.health-analytics {
+    width: 100%;
+    padding: 20px 40px;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- DAILY SECTION --- */
+.health-analytics .daily {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    background: var(--container-bg-color); /* Theme variable */
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--card-shadow); /* Theme variable */
+    border: 1px solid var(--border-color); /* Theme variable */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.health-analytics .daily:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px var(--card-shadow);
+}
+
+.health-analytics .daily .emotion-icon-wrapper {
+    width: 100px;
+    height: 100px;
+    background-color: #FFD700; /* Keep yellow for pop */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+}
+
+.health-analytics .daily .emotion-icon-wrapper i {
+    font-size: 50px;
+    color: #fff; /* Icon remains white */
+}
+
+.health-analytics .daily .daily-progress {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.health-analytics .daily h1 {
+    font-family: var(--newsreader-font);
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.health-analytics .daily h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color); /* Dynamic text color */
+    margin: 0;
+}
+
+/* --- MODERN PROGRESS BARS (Horizontal) --- */
+.modern-progress-track {
+    width: 100%;
+    height: 18px;
+    background-color: var(--scrollbar-bg-color); /* Adapts to dark mode */
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.modern-progress-fill {
+    height: 100%;
+    border-radius: 50px;
+    transition: width 1s ease-out;
+}
+
+/* Gradients */
+.main-gradient { background: linear-gradient(90deg, #d4fc79 0%, #96e6a1 100%); }
+.morning-gradient { background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%); }
+.afternoon-gradient { background: linear-gradient(90deg, #84fab0 0%, #8fd3f4 100%); }
+.evening-gradient { background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%); }
+
+
+/* --- TIME TO TIME & WEEKLY LAYOUT --- */
+.health-analytics .time-to-time-and-weekly {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+.health-analytics .time-to-time {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.time-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    border-radius: 15px;
+    transition: transform 0.2s;
+    background: var(--container-bg-color); /* Card background */
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px var(--card-shadow);
+}
+
+.time-card:hover {
+    background-color: var(--scrollbar-bg-color); /* Slight highlight */
+    transform: translateX(5px);
+}
+
+.time-card .icon-box {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--input-bg); /* Input bg usually fits well here */
+    border-radius: 50%;
+}
+.time-card .icon-box img { width: 35px; }
+
+.time-card .info-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.time-card .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.time-card .header-row h3 {
+    font-family: var(--newsreader-font);
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.time-card .header-row span {
+    font-weight: bold;
+    color: var(--grayish-color);
+}
+
+/* --- WEEKLY CHART (Vertical Capsules) --- */
+.health-analytics .weekly {
+    flex: 1;
+    background: var(--container-bg-color);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.health-analytics .weekly h1 {
+    font-family: var(--newsreader-font);
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+}
+
+#weekly-chart {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 250px;
+    padding: 0 10px;
+}
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-track {
+    width: 30px;
+    height: 85%;
+    background-color: var(--scrollbar-bg-color); /* Dynamic track color */
+    border-radius: 50px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.bar-fill {
+    width: 100%;
+    border-radius: 50px;
+    transition: height 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Stress Colors for Weekly Bars */
+.low-stress { background: #8FD3F4; }
+.medium-stress { background: #FFD1FF; }
+.high-stress { background: #fa709a; }
+
+.day-label {
+    font-size: 0.85rem;
+    color: var(--grayish-color);
+    font-weight: 500;
+}
+
+/* --- MOOD HISTORY SECTION --- */
+.health-analytics .mood-history {
+    width: 100%;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.health-analytics .mood-history h1 {
+    font-family: var(--newsreader-font);
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.health-analytics .mood-history .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.health-analytics .mood-history .history-item {
+    background-color: var(--container-bg-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px var(--card-shadow);
+    border: 1px solid var(--border-color);
+    display: grid;
+    /* Adjusted grid: Date | Icon | Note (flexible) | Stress Badge */
+    grid-template-columns: 150px 80px 1fr 120px; 
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.health-analytics .mood-history .history-item:hover {
+    transform: translateX(5px);
+}
+
+/* Date & Time Column */
+.history-item .log-meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.history-item .log-meta .log-date {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.history-item .log-meta .log-time {
+    font-size: 0.9rem;
+    color: var(--grayish-color);
+}
+
+/* Mood Icon Column */
+.history-item .log-mood {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.history-item .log-mood i {
+    font-size: 2.5rem;
+}
+
+/* Mood Colors (Consistent with app) */
+.history-item .log-mood.mood-1 { color: #7CFC00; }
+.history-item .log-mood.mood-2 { color: #ADFF2F; }
+.history-item .log-mood.mood-3 { color: #FFD700; }
+.history-item .log-mood.mood-4 { color: #FFA500; }
+.history-item .log-mood.mood-5 { color: #FF0000; }
+
+/* Dynamic Border Color based on Mood */
+.history-item:has(.mood-1) { border-left-color: #7CFC00; }
+.history-item:has(.mood-2) { border-left-color: #ADFF2F; }
+.history-item:has(.mood-3) { border-left-color: #FFD700; }
+.history-item:has(.mood-4) { border-left-color: #FFA500; }
+.history-item:has(.mood-5) { border-left-color: #FF0000; }
+
+/* Note Column */
+.history-item .log-note p {
+    font-family: var(--inter-font);
+    color: var(--text-color);
+    font-style: italic;
+    margin: 0;
+}
+
+.history-item .log-note p.empty {
+    color: var(--grayish-color);
+    font-style: normal;
+}
+
+/* Stress Badge */
+.stress-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+}
+.stress-badge.low { background: rgba(0, 96, 100, 0.1); color: #006064; }
+.stress-badge.high { background: rgba(198, 40, 40, 0.1); color: #c62828; }
+
+/* Dark Mode Badge Adjustment */
+.dark-mode .stress-badge.low { background: rgba(128, 222, 234, 0.2); color: #80deea; }
+.dark-mode .stress-badge.high { background: rgba(239, 154, 154, 0.2); color: #ef9a9a; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .health-analytics .time-to-time-and-weekly {
+        flex-direction: column;
+    }
+    .health-analytics .weekly {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .health-analytics .mood-history .history-item {
+        grid-template-columns: 1fr 1fr; /* Stack into 2x2 grid */
+        gap: 15px;
+    }
+    
+    /* Make note span full width on mobile */
+    .history-item .log-note {
+        grid-column: span 2; 
+    }
+    
+    /* Center badges on mobile */
+    .stress-badge {
+        justify-self: center;
+    }
+}

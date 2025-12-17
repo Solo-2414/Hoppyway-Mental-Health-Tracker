@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}{% endblock %}</title>
+
+        <link rel="stylesheet" href="/static/css/style.css" />
+        <link rel="shortcut icon" href="/static/images/logo.png" type="image/x-icon" />
+    </head>
+    <body>
+
+        <!-- FLASH MESSAGES -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <!-- END FLASH MESSAGES -->
+
+        <header>
+            <div class="logo">
+                <img src="/static/images/logo.png" alt="Logo failed to load" />
+                <h2>HoppyWay</h2>
+            </div>
+
+            <nav>
+                <a href="">Home</a>
+                <a href="">About</a>
+                <a href="">FAQ</a>
+            </nav>
+
+            <div class="button">
+                <button class="sign-up">Sign Up</button>
+            </div>
+        </header>
+
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+
+        <footer>
+            <p>&copy; 2025 HoppyWay. All Rights Reserved.</p>
+        </footer>
+
+        <script src="https://kit.fontawesome.com/cfba8e65a0.js" crossorigin="anonymous"></script>
+        <script src="/static/js/script.js"></script>
+    </body>
+</html>

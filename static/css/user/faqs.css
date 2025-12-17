@@ -1,0 +1,35 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Lato', sans-serif;
+}
+
+h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+}
+
+.faq-item {
+    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: var(--card-bg-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.faq-item h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.faq-item p {
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+/* End of faqs.css */

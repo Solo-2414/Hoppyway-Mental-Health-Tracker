@@ -1,0 +1,172 @@
+/* ===== Announcements Page ===== */
+
+.announcements-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--inter-font);
+    color: var(--text-color);
+    text-align: left;
+}
+
+/* ===== Card for Form ===== */
+.announcement-form-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 25px 30px;
+    border-radius: 18px;
+    color: var(--text-color);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    width: 100%;
+}
+
+.dark-mode .announcement-form-card {
+    background: rgba(40, 40, 40, 0.6);
+}
+
+/* ===== Section Title ===== */
+.announcement-form-card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-family: var(--inter-font);
+}
+
+/* ===== Form Styling ===== */
+#announcementForm {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--inter-font);
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--container-bg-color);
+    font-size: 15px;
+    resize: none;
+    color: var(--text-color);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(70, 94, 215, 0.15);
+}
+
+/* ===== Submit Button ===== */
+.btn-submit {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 12px 0;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-family: var(--inter-font);
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+    margin-top: 5px;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-color-hover);
+    transform: translateY(-1px);
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+    .announcement-form-card {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+}
+
+.announce-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    background: #465ed7;
+    color: white;
+    font-size: 15px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 0.3s ease;
+    z-index: 3000;
+}
+
+.announce-alert.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.announce-alert.success {
+    background: #52c41a;
+}
+
+.announce-alert.error {
+    background: #ff4d4f;
+}
+
+.announce-alert {
+    position: fixed;
+    top: 90px;
+    right: 30px;
+    padding: 15px 25px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.95rem;
+    font-family: var(--inter-font);
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.announce-alert.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.announce-alert.success {
+    background-color: #2ecc71;
+}
+
+.announce-alert.error {
+    background-color: #e74c3c;
+}

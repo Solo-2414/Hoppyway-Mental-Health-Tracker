@@ -1,0 +1,119 @@
+{% extends "admin/base.html" %} 
+{% block title %}Dashboard | HoppyWay{% endblock %} 
+{% block content %}
+
+<link rel="stylesheet" href="/static/css/admin/dashboard.css" />
+
+<div class="dashboard-wrapper">
+    <div class="page-header">
+        <h1>Dashboard Overview</h1>
+        <p>Welcome back, Admin. Here is your daily report.</p>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="icon-box blue"><i class="fas fa-users"></i></div>
+            <div class="metric-text">
+                <h3>Total Users</h3>
+                <p id="total-users-count">...</p> 
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="icon-box orange"><i class="fas fa-face-smile"></i></div>
+            <div class="metric-text">
+                <h3>Avg Mood</h3>
+                <p id="avg-mood-score">...</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="icon-box green"><i class="fas fa-check-circle"></i></div>
+            <div class="metric-text">
+                <h3>Daily Check-ins</h3>
+                <p id="daily-checkins">...</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="icon-box purple"><i class="fas fa-chart-line"></i></div>
+            <div class="metric-text">
+                <h3>Engagement</h3>
+                <p id="engagement-status">Loading engagement</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="charts-section">
+        <div class="chart-card">
+            <h3>Mood Distribution</h3>
+            <div class="canvas-wrapper">
+                <canvas id="moodPieChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card wide">
+            <h3>User Activity (Weekly)</h3>
+            <div class="canvas-wrapper">
+                <canvas id="userActivityBarChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Engagement Trends</h3>
+            <div class="canvas-wrapper">
+                <canvas id="engagementLineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-header">
+            <h3>User Demographics</h3>
+            <div class="controls">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="tableSearch" placeholder="Search users...">
+                </div>
+                
+                <select id="filterEmotionalState">
+                    <option value="all">All Moods</option>
+                    <option value="Excited">Excited</option>
+                    <option value="Happy">Happy</option>
+                    <option value="Neutral">Neutral</option>
+                    <option value="Sad">Sad</option>
+                    <option value="Devastated">Devastated</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Current State</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="skeleton"><td colspan="6"></td></tr>
+                    <tr class="skeleton"><td colspan="6"></td></tr>
+                    <tr class="skeleton"><td colspan="6"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+            <button id="prevPage" disabled><i class="fas fa-chevron-left"></i></button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button id="nextPage" disabled><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/admin/dashboard.js"></script>
+{% endblock %}

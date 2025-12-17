@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %} {% block title %}Announcements | HoppyWay{%
+endblock %} {% block content %}
+<link rel="stylesheet" href="/static/css/admin/announcements.css" />
+
+<section class="announcements-section">
+    <h1 class="page-title">Manage Announcements</h1>
+
+    <div class="announcement-form-card">
+        <h2>Create New Announcement</h2>
+        <form id="announcementForm">
+            <div class="form-group">
+                <label for="announcementTitle">Title</label>
+                <input
+                    type="text"
+                    id="announcementTitle"
+                    name="announcementTitle"
+                    required
+                />
+            </div>
+            <div class="form-group">
+                <label for="announcementContent">Content</label>
+                <textarea
+                    id="announcementContent"
+                    name="announcementContent"
+                    rows="4"
+                    required
+                ></textarea>
+            </div>
+            <button type="submit" class="btn-submit">
+                Publish Announcement
+            </button>
+        </form>
+    </div>
+</section>
+
+<script src="/static/js/admin/announcements.js"></script>
+{% endblock %}
