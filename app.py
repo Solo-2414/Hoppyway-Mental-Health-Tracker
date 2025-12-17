@@ -6,21 +6,15 @@ import pymysql
 import random
 import calendar
 from datetime import datetime, timedelta
-from sqlalchemy import or_, func # Added func for charts
-# Added Content to imports so Admin APIs work
+from sqlalchemy import or_, func
+from config import Config
 from models import db, User, Admin, MoodLog, Notification, Chat, Content, Journal
 from health_track import health_bp
 
 pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
-app.secret_key = "hoppyway-secret-key-123"
-
-# ---------------------------------
-# DATABASE CONFIG
-# ---------------------------------
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://root:241405@localhost/hoppy_way_db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config.from_object(Config)
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -373,31 +367,6 @@ def logout():
     return redirect('/')
 
 # ---------------------------------
-# REPORT BUG API (User Submit)
-# ---------------------------------
-@app.route('/api/reports', methods=['POST'])
-@login_required
-def api_create_report():
-    data = request.get_json()
-    description = data.get('description')
-    report_type = data.get('type', 'Bug Report') # Default to Bug Report
-
-    if not description:
-        return jsonify({'error': 'Description is required'}), 400
-
-    new_report = Report(
-        user_id=session['user_id'],
-        type=report_type,
-        description=description,
-        status='Pending'
-    )
-    
-    db.session.add(new_report)
-    db.session.commit()
-    
-    return jsonify({'message': 'Report submitted successfully'}), 201
-
-# ---------------------------------
 # NOTIFICATIONS ROUTES
 # ---------------------------------
 @app.route('/notifications')
@@ -480,11 +449,6 @@ def admin_dashboard():
 def admin_manage_users():
     users = User.query.all()
     return render_template('admin/manage_users.html', users=users, active_page='manage_users')
-
-@app.route('/reports')
-@admin_required
-def admin_reports(): 
-    return render_template('admin/reports.html', active_page='reports')
 
 @app.route('/manage_content')
 @admin_required
