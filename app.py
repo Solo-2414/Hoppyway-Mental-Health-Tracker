@@ -501,7 +501,13 @@ def api_users_demographics():
     """Fetch all users with their latest mood emotional state"""
     users = User.query.filter_by(role="user").all()
     
-    mood_mapping = {1: "Devastated", 2: "Sad", 3: "Neutral", 4: "Happy", 5: "Excited"}
+    mood_mapping = {
+    1: "Great", 
+    2: "Good", 
+    3: "Neutral", 
+    4: "Bad", 
+    5: "Awful"
+    }
     
     users_data = []
     for user in users:
