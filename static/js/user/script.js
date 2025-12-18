@@ -20,39 +20,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const settingsGear = document.getElementById("settings-gear");
     const settingsDropdown = document.getElementById("settings-dropdown");
     const settingsWrapper = document.querySelector(".settings-wrapper");
-    
-    // Select the User Icon (Assuming it's the one in .icons div)
+
     const userIconBtn = document.querySelector(".icons .fa-user"); 
 
     const notifBell = document.getElementById("notif-bell");
     const notifDropdown = document.getElementById("notif-dropdown");
     const notifWrapper = document.querySelector(".notif-wrapper");
 
-    // Helper: Toggle Settings Dropdown
     function toggleSettings(e) {
         e.stopPropagation();
         
-        // Close Notification if open
         if (notifDropdown) notifDropdown.classList.remove("show");
-        
-        // Toggle Settings
+
         if (settingsGear) settingsGear.classList.toggle("spin");
         if (settingsDropdown) settingsDropdown.classList.toggle("show");
     }
 
-    // Event Listeners for Settings
     if (settingsGear) settingsGear.addEventListener("click", toggleSettings);
     if (userIconBtn) {
-        userIconBtn.style.cursor = "pointer"; // Ensure it looks clickable
+        userIconBtn.style.cursor = "pointer";
         userIconBtn.addEventListener("click", toggleSettings);
     }
 
-    // Event Listener for Notifications
     if (notifBell) {
         notifBell.addEventListener("click", (e) => {
             e.stopPropagation();
-            
-            // Close Settings if open
+
             if (settingsDropdown) settingsDropdown.classList.remove("show");
             if (settingsGear) settingsGear.classList.remove("spin");
 
@@ -60,20 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Close on Outside Click
     document.addEventListener("click", (e) => {
-        // Close Settings
         if (settingsWrapper && !settingsWrapper.contains(e.target) && e.target !== userIconBtn) {
             if (settingsDropdown) settingsDropdown.classList.remove("show");
             if (settingsGear) settingsGear.classList.remove("spin");
         }
-        
-        // Close Notifications
+
         if (notifWrapper && !notifWrapper.contains(e.target)) {
             if (notifDropdown) notifDropdown.classList.remove("show");
         }
 
-        // Close Edit Profile Modal on Background Click
         const editModal = document.getElementById("editProfileModal");
         if (editModal && e.target === editModal) {
             closeEditModal();
@@ -83,54 +72,45 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================
     // 3. EDIT PROFILE LOGIC
     // ============================
-    const editProfileBtn = document.querySelector(".edit-profile-btn"); // Button in dropdown
-    const profileBtn = document.querySelector(".profile-btn"); // Alternative button class if used
+    const editProfileBtn = document.querySelector(".edit-profile-btn");
+    const profileBtn = document.querySelector(".profile-btn");
     const editModal = document.getElementById("editProfileModal");
     const editForm = document.getElementById("editProfileForm");
     const closeEditBtn = editModal ? editModal.querySelector(".close-btn") : null;
 
-    // Helper: Open Modal
     function openEditModal() {
         if (!editModal) return;
         
-        // Close dropdowns first
         if (settingsDropdown) settingsDropdown.classList.remove("show");
         if (settingsGear) settingsGear.classList.remove("spin");
 
         editModal.style.display = "flex";
-        // Small delay to allow display:flex to apply before adding opacity class for animation
         setTimeout(() => { editModal.classList.add("active"); }, 10);
         document.body.classList.add("modal-open");
     }
 
-    // Helper: Close Modal
     function closeEditModal() {
         if (!editModal) return;
         editModal.classList.remove("active");
         document.body.classList.remove("modal-open");
-        
-        // Wait for animation to finish before hiding
+
         setTimeout(() => { editModal.style.display = "none"; }, 300);
     }
 
-    // Event Listeners
     if (editProfileBtn) editProfileBtn.addEventListener("click", openEditModal);
-    if (profileBtn) profileBtn.addEventListener("click", openEditModal); // Just in case you use this class
+    if (profileBtn) profileBtn.addEventListener("click", openEditModal);
     if (closeEditBtn) closeEditBtn.addEventListener("click", closeEditModal);
 
-    // Handle Form Submit
     if (editForm) {
         editForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             
             const btn = editForm.querySelector("button[type='submit']");
             const originalText = btn.innerText;
-            
-            // UX: Loading State
+
             btn.innerText = "Saving...";
             btn.disabled = true;
 
-            // Gather Data
             const data = {
                 name: document.getElementById("editName").value,
                 username: document.getElementById("editUsername").value,
@@ -149,7 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (response.ok) {
                     alert("Profile updated successfully!");
                     closeEditModal();
-                    // Reload page to reflect changes (e.g. name in header)
                     location.reload(); 
                 } else {
                     alert("Error: " + (result.error || "Failed to update profile"));
@@ -158,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error("Update Error:", error);
                 alert("An error occurred. Please try again.");
             } finally {
-                // Reset Button
                 btn.innerText = originalText;
                 btn.disabled = false;
             }
@@ -182,11 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Check Local Storage on Load
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) applyTheme(savedTheme);
 
-    // Toggle Click Listener
     if (darkToggle) {
         darkToggle.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -214,4 +190,75 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "/notifications";
         });
     }
+
+    // ==========================================
+    // 6. REAL-TIME NOTIFICATION POLLING
+    // ==========================================
+    
+    function startNotificationPolling() {
+        setInterval(fetchNotifications, 5000);
+    }
+
+    async function fetchNotifications() {
+        try {
+            const response = await fetch('/api/notifications/poll');
+            if (!response.ok) return;
+
+            const data = await response.json();
+            updateNotificationUI(data);
+        } catch (error) {
+            console.error("Polling Error:", error);
+        }
+    }
+
+    function updateNotificationUI(data) {
+        const notifWrapper = document.querySelector(".notif-wrapper");
+        const bellIcon = document.getElementById("notif-bell");
+        const notifList = document.querySelector(".notif-list");
+        
+        let badge = document.querySelector(".notif-badge");
+        
+        if (data.count > 0) {
+            if (!badge) {
+                badge = document.createElement("span");
+                badge.className = "notif-badge";
+                notifWrapper.insertBefore(badge, bellIcon.nextSibling);
+            }
+            badge.innerText = data.count;
+            badge.style.display = "flex";
+        } else {
+            if (badge) badge.style.display = "none";
+        }
+
+        if (data.notifications.length > 0) {
+            notifList.innerHTML = "";
+            
+            data.notifications.forEach(n => {
+                const item = document.createElement("div");
+                item.className = "notif-item";
+                item.onclick = () => window.location.href = '/notifications';
+                
+                item.innerHTML = `
+                    <span class="notif-icon">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </span>
+                    <div class="notif-content">
+                        <p>${n.message}</p>
+                        <span class="notif-meta">${n.time}</span>
+                    </div>
+                `;
+                notifList.appendChild(item);
+            });
+        } else {
+            if (data.count === 0) {
+                notifList.innerHTML = `
+                    <div class="notif-empty">
+                        <p>No new notifications</p>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    startNotificationPolling();
 });

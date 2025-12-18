@@ -39,7 +39,6 @@ POSITIVE_QUOTES = [
 # ---------------------------------
 # CONTEXT PROCESSOR (Notifications)
 # ---------------------------------
-# Provides current user and recent notifications to all templates
 @app.context_processor
 def inject_user_notifications():
     user = None
@@ -48,7 +47,6 @@ def inject_user_notifications():
     user_id = session.get('user_id')
     if user_id:
         user = User.query.get(user_id)
-        # recent notifications (limit 5)
         notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc()).limit(5).all()
         unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
     return dict(user=user, notifications=notifications, notif_unread_count=unread_count)
@@ -78,6 +76,7 @@ def admin_required(f):
 # MOOD LOGGING
 # ---------------------------------
 @app.route("/log_mood", methods=["POST"])
+@login_required
 def log_mood():
     mood_value = request.form.get("mood_value")
     stress_value = request.form.get("stress_value")
@@ -106,15 +105,12 @@ def signup():
     password = request.form["password"]
     confirm = request.form["confirm_password"]
 
-    # Check Email
     if User.query.filter_by(email=email).first():
         return render_template("index.html", signup_error="email", message="Email already exists.", show_modal="signup")
-    
-    # Check Username
+
     if User.query.filter_by(username=username).first():
         return render_template("index.html", signup_error="username", message="Username already exists.", show_modal="signup")
-    
-    # Check Passwords match
+
     if password != confirm:
         return render_template("index.html", signup_error="confirm_password", message="Passwords do not match.", show_modal="signup")
 
@@ -123,13 +119,12 @@ def signup():
     
     db.session.add(new_user)
     db.session.commit()
-    
-    # --- UPDATED SESSION LOGIC ---
+
     session["user_id"] = new_user.id
     session["role"] = new_user.role
-    session["name"] = new_user.name       # Store name for immediate display
-    session["username"] = new_user.username # Store username
-    session["is_first_login"] = True      # FLAG: Set this only on signup
+    session["name"] = new_user.name
+    session["username"] = new_user.username
+    session["is_first_login"] = True
     
     flash("Account created! Welcome to HoppyWay.", "success")
     return redirect("/home")
@@ -138,8 +133,7 @@ def signup():
 def signin():
     email = request.form['email']
     password = request.form['password']
-    
-    # 1. Admin Logic
+
     admin = Admin.query.filter_by(email=email).first()
     if admin:
         if not bcrypt.check_password_hash(admin.password, password):
@@ -150,22 +144,19 @@ def signin():
         session['role'] = "admin"
         return redirect('/dashboard')
 
-    # 2. User Logic
     user = User.query.filter_by(email=email).first()
     if not user: 
         return render_template("index.html", login_error="email", message="Email not found", show_modal="signin")
     
     if not bcrypt.check_password_hash(user.password, password): 
         return render_template("index.html", login_error="password", message="Wrong password", show_modal="signin")
-    
-    # Update last login
+
     user.last_login = datetime.now()
     db.session.commit()
 
-    # --- UPDATED SESSION LOGIC ---
     session['user_id'] = user.id
     session['username'] = user.username
-    session['name'] = user.name  # Ensure name is stored
+    session['name'] = user.name
     session['role'] = user.role
     
     flash("Welcome back!", "success")
@@ -183,15 +174,11 @@ def index():
 def home(): 
     user_id = session.get("user_id")
 
-    # --- 1. DETERMINE GREETING ---
-    # Check if the "is_first_login" flag exists in the session
-    # session.pop() retrieves the value AND removes it from the session immediately
     if session.pop('is_first_login', False):
         greeting = "Welcome"
     else:
         greeting = "Welcome Back"
 
-    # --- 2. EXISTING DASHBOARD LOGIC ---
     daily_quote = random.choice(POSITIVE_QUOTES)
     
     recent_logs = MoodLog.query.filter_by(user_id=user_id)\
@@ -219,7 +206,7 @@ def home():
         quote=daily_quote,
         recent_logs=recent_logs,
         weekly_data=weekly_data,
-        greeting=greeting # Pass the dynamic greeting to HTML
+        greeting=greeting
     )
 
 @app.route("/my_moods")
@@ -236,13 +223,12 @@ def my_moods():
 def log_journal():
     data = request.json
     title = data.get('title')
-    entry = data.get('entry') # In JS we sent 'entry', but model uses 'content'
+    entry = data.get('entry')
     user_id = session.get('user_id')
 
     if not title or not entry:
         return jsonify({"status": "error", "message": "Missing fields"}), 400
 
-    # Create new journal entry
     new_journal = Journal(
         user_id=user_id, 
         title=title, 
@@ -257,11 +243,9 @@ def log_journal():
 # ---------------------------------
 # JOURNAL ROUTES (View & Delete)
 # ---------------------------------
-
 @app.route('/my_journals')
 @login_required
 def my_journals():
-    # Fetch user's journals, newest first
     user_id = session.get("user_id")
     journals = Journal.query.filter_by(user_id=user_id).order_by(Journal.created_at.desc()).all()
     return render_template('user/journals.html', journals=journals, active_page='journals')
@@ -270,8 +254,7 @@ def my_journals():
 @login_required
 def delete_journal(journal_id):
     journal = Journal.query.get_or_404(journal_id)
-    
-    # Security check: Ensure current user owns this journal
+
     if journal.user_id != session.get("user_id"):
         flash("Unauthorized action.", "danger")
         return redirect(url_for('my_journals'))
@@ -280,6 +263,7 @@ def delete_journal(journal_id):
     db.session.commit()
     flash("Journal entry deleted.", "success")
     return redirect(url_for('my_journals'))
+
 # ---------------------------------
 # MESSAGES ROUTE & API (From Code 2)
 # ---------------------------------
@@ -335,9 +319,38 @@ def get_messages(receiver_id):
 @login_required
 def send_message():
     data = request.json
-    new_msg = Chat(sender_id=session['user_id'], receiver_id=data['receiver_id'], message_text=data['message'])
-    db.session.add(new_msg); db.session.commit()
-    return jsonify({"status": "success"})
+    sender_id = session['user_id']
+    receiver_id = data.get('receiver_id')
+    message_text = data.get('message')
+
+    if not receiver_id or not message_text:
+        return jsonify({"error": "Missing data"}), 400
+
+    new_msg = Chat(
+        sender_id=sender_id, 
+        receiver_id=receiver_id, 
+        message_text=message_text
+    )
+    db.session.add(new_msg)
+
+    existing_notif = Notification.query.filter_by(
+        user_id=receiver_id, 
+        message=f"You have a new message from {session.get('name', 'a user')}",
+        is_read=False
+    ).first()
+
+    if not existing_notif:
+        sender_name = session.get('name', 'Someone')
+        notif = Notification(
+            user_id=receiver_id,
+            message=f"You have a new message from {sender_name}",
+            is_read=False
+        )
+        db.session.add(notif)
+
+    db.session.commit()
+    
+    return jsonify({"status": "success"}), 200
 
 # ---------------------------------
 # USER CONTENT ROUTES
@@ -374,10 +387,8 @@ def logout():
 @login_required
 def view_notifications():
     user_id = session.get('user_id')
-    # fetch all notifications for user
     notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc()).all()
 
-    # mark unread as read
     to_mark = [n for n in notifications if not n.is_read]
     if to_mark:
         for n in to_mark:
@@ -399,6 +410,34 @@ def api_delete_notification(notif_id):
     return jsonify({'message': 'Notification deleted'}), 200
 
 # ---------------------------------
+# API: GET UNREAD NOTIFICATIONS
+# ---------------------------------
+@app.route('/api/notifications/poll', methods=['GET'])
+@login_required
+def api_poll_notifications():
+    user_id = session.get('user_id')
+    
+
+    unread_count = Notification.query.filter_by(user_id=user_id, is_read=False).count()
+
+    recent_notifs = Notification.query.filter_by(user_id=user_id, is_read=False)\
+        .order_by(Notification.created_at.desc())\
+        .limit(5).all()
+
+    notif_list = []
+    for n in recent_notifs:
+        notif_list.append({
+            'id': n.id,
+            'message': n.message,
+            'time': n.created_at.strftime('%b %d, %I:%M %p')
+        })
+        
+    return jsonify({
+        'count': unread_count,
+        'notifications': notif_list
+    })
+
+# ---------------------------------
 # UPDATE PROFILE API
 # ---------------------------------
 @app.route('/api/user/update', methods=['PUT'])
@@ -411,11 +450,9 @@ def api_update_profile():
     new_username = data.get('username')
     new_email = data.get('email')
 
-    # Basic Validation
     if not new_name or not new_username or not new_email:
         return jsonify({'error': 'All fields are required'}), 400
 
-    # Check for duplicates (exclude current user)
     existing_user = User.query.filter(
         (User.username == new_username) | (User.email == new_email)
     ).filter(User.id != user.id).first()
@@ -428,8 +465,7 @@ def api_update_profile():
         user.username = new_username
         user.email = new_email
         db.session.commit()
-        
-        # Update session if name changed
+
         session['user_name'] = user.name
         
         return jsonify({'message': 'Profile updated successfully!'}), 200
@@ -756,14 +792,10 @@ def api_create_announcement():
     if not title or not content:
         return jsonify({'error': 'Missing title or content'}), 400
 
-    # Format the message
-    # You can customize this format (e.g., "Announcement: [Title] - [Content]")
     full_message = f"📢 {title}: {content}"
     
-    # 1. Fetch all active users
     users = User.query.filter_by(role='user').all()
     
-    # 2. Create a notification for EVERY user
     new_notifications = []
     for user in users:
         notif = Notification(
@@ -772,8 +804,7 @@ def api_create_announcement():
             is_read=False
         )
         new_notifications.append(notif)
-    
-    # 3. Bulk save to database (Faster than adding one by one)
+
     if new_notifications:
         db.session.add_all(new_notifications)
         db.session.commit()
