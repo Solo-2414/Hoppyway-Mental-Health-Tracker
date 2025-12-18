@@ -1,17 +1,20 @@
 import os
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        "mysql+pymysql://root:241405@localhost/hoppy_way_db"
+    uri = os.environ.get('DATABASE_URL')
+    
+    if uri:
+        if uri.startswith("mysql://"):
+            uri = uri.replace("mysql://", "mysql+pymysql://", 1)
+        SQLALCHEMY_DATABASE_URI = uri
+    else:
+        SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:241405@localhost/hoppy_way_db"
 
-    if os.environ.get('DATABASE_URL'):
-        SQLALCHEMY_ENGINE_OPTIONS = {
-            "connect_args": {
-                "ssl": {
-                    "fake_flag_to_trigger_ssl": True
-                }
-            }
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "connect_args": {
+            "ssl": {"ssl_mode": "REQUIRED"}
         }
+    }
     
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hoppyway-secret-key-123'
     SQLALCHEMY_TRACK_MODIFICATIONS = False

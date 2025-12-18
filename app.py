@@ -5,6 +5,7 @@ from functools import wraps
 import pymysql
 import random
 import calendar
+import os
 from datetime import datetime, timedelta
 from sqlalchemy import or_, func
 from config import Config
@@ -782,4 +783,5 @@ app.register_blueprint(health_bp)
 
 if __name__ == "__main__":
     with app.app_context(): db.create_all()
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
