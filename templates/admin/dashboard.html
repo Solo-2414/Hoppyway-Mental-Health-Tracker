@@ -18,7 +18,6 @@
                 <p id="total-users-count">...</p> 
             </div>
         </div>
-
         <div class="metric-card">
             <div class="icon-box orange"><i class="fas fa-face-smile"></i></div>
             <div class="metric-text">
@@ -26,7 +25,6 @@
                 <p id="avg-mood-score">...</p>
             </div>
         </div>
-
         <div class="metric-card">
             <div class="icon-box green"><i class="fas fa-check-circle"></i></div>
             <div class="metric-text">
@@ -34,12 +32,11 @@
                 <p id="daily-checkins">...</p>
             </div>
         </div>
-
         <div class="metric-card">
             <div class="icon-box purple"><i class="fas fa-chart-line"></i></div>
             <div class="metric-text">
                 <h3>Engagement</h3>
-                <p id="engagement-status">Loading engagement</p>
+                <p id="engagement-status">Loading...</p>
             </div>
         </div>
     </div>
@@ -47,23 +44,15 @@
     <div class="charts-section">
         <div class="chart-card">
             <h3>Mood Distribution</h3>
-            <div class="canvas-wrapper">
-                <canvas id="moodPieChart"></canvas>
-            </div>
+            <div class="canvas-wrapper"><canvas id="moodPieChart"></canvas></div>
         </div>
-        
         <div class="chart-card wide">
             <h3>User Activity (Weekly)</h3>
-            <div class="canvas-wrapper">
-                <canvas id="userActivityBarChart"></canvas>
-            </div>
+            <div class="canvas-wrapper"><canvas id="userActivityBarChart"></canvas></div>
         </div>
-
         <div class="chart-card">
             <h3>Engagement Trends</h3>
-            <div class="canvas-wrapper">
-                <canvas id="engagementLineChart"></canvas>
-            </div>
+            <div class="canvas-wrapper"><canvas id="engagementLineChart"></canvas></div>
         </div>
     </div>
 
@@ -78,11 +67,11 @@
                 
                 <select id="filterEmotionalState">
                     <option value="all">All Moods</option>
-                    <option value="Excited">Excited</option>
-                    <option value="Happy">Happy</option>
+                    <option value="Great">Great</option>
+                    <option value="Good">Good</option>
                     <option value="Neutral">Neutral</option>
-                    <option value="Sad">Sad</option>
-                    <option value="Devastated">Devastated</option>
+                    <option value="Bad">Bad</option>
+                    <option value="Awful">Awful</option>
                 </select>
             </div>
         </div>

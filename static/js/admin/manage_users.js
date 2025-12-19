@@ -293,25 +293,92 @@ function openDeleteUser(id) {
     const user = users.find((u) => u.id === id);
     if (!deleteUserModal) createDeleteModal();
 
+    const modalTitle = deleteUserModal.querySelector("h2");
     const deleteText = deleteUserModal.querySelector(".delete-text");
-    deleteText.innerHTML = `Are you sure you want to delete <strong>${user.name}</strong>?`;
+    const deactivateBtn = document.getElementById("deactivateBtn");
+    const deleteBtn = document.getElementById("confirmDeleteBtn");
+
+    // Update Content
+    modalTitle.innerText = "Account Actions";
+    deleteText.innerHTML = `Manage access for <strong>${user.name}</strong> (@${user.username})`;
+
+    // Configure Deactivate Button State
+    // Check 'status' (safely handle undefined or null)
+    const currentStatus = user.status ? user.status.toLowerCase() : 'active';
+    const isDeactivated = currentStatus === 'disabled';
+
+    deactivateBtn.innerHTML = isDeactivated 
+        ? '<i class="fa-solid fa-unlock"></i> Activate Account' 
+        : '<i class="fa-solid fa-ban"></i> Deactivate Account';
     
-    const confirmBtn = document.getElementById("confirmDeleteBtn");
-    // Fix listener stacking by replacing node
-    const newBtn = confirmBtn.cloneNode(true);
-    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+    deactivateBtn.className = isDeactivated 
+        ? "btn full btn-success" 
+        : "btn full btn-warning";
+
+    // --- Deactivate Logic ---
+    // Clone to remove old listeners
+    const newDeactivateBtn = deactivateBtn.cloneNode(true);
+    deactivateBtn.parentNode.replaceChild(newDeactivateBtn, deactivateBtn);
+
+    newDeactivateBtn.onclick = async () => {
+        const newStatus = isDeactivated ? 'active' : 'disabled';
+        const actionText = isDeactivated ? "activate" : "deactivate";
+        
+        if(!confirm(`Are you sure you want to ${actionText} this user?`)) return;
+
+        const originalText = newDeactivateBtn.innerHTML;
+        newDeactivateBtn.innerText = "Processing...";
+        newDeactivateBtn.disabled = true;
+
+        try {
+            const response = await fetch(`/api/users/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.ok) {
+                alert(`User ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully.`);
+                closeModal(deleteUserModal);
+                fetchUsers(); // Refresh table to show new status
+            } else {
+                const err = await response.json();
+                alert("Error: " + (err.error || "Failed to update status"));
+            }
+        } catch (err) { 
+            console.error(err); 
+            alert("Network error occurred.");
+        } finally {
+            newDeactivateBtn.innerHTML = originalText;
+            newDeactivateBtn.disabled = false;
+        }
+    };
+
+    // --- Delete Logic ---
+    const newDeleteBtn = deleteBtn.cloneNode(true);
+    deleteBtn.parentNode.replaceChild(newDeleteBtn, deleteBtn);
     
-    newBtn.onclick = async () => {
+    newDeleteBtn.onclick = async () => {
+        if(!confirm("⚠️ WARNING: This action is permanent and cannot be undone.\n\nAre you sure you want to delete this user?")) return;
+        
+        const originalText = newDeleteBtn.innerHTML;
+        newDeleteBtn.innerText = "Deleting...";
+        newDeleteBtn.disabled = true;
+
         try {
             const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
             if (response.ok) {
-                alert("User deleted.");
+                alert("User deleted permanently.");
                 closeModal(deleteUserModal);
                 fetchUsers();
             } else {
                 alert("Failed to delete user.");
             }
         } catch (err) { console.error(err); }
+        finally {
+            newDeleteBtn.innerHTML = originalText;
+            newDeleteBtn.disabled = false;
+        }
     };
 
     openModal(deleteUserModal);
@@ -321,12 +388,22 @@ function createDeleteModal() {
     deleteUserModal = document.createElement("div");
     deleteUserModal.className = "modal-overlay";
     deleteUserModal.innerHTML = `
-        <div class="modal-box">
-            <h2>Delete User</h2>
+        <div class="modal-box action-modal">
+            <h2>Account Actions</h2>
             <p class="delete-text"></p>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button id="confirmDeleteBtn" class="btn primary full" style="background:#FF3B30;">Delete</button>
-                <button class="btn full close-delete">Cancel</button>
+            
+            <div class="modal-actions-stack">
+                <button id="deactivateBtn" class="btn full btn-warning">
+                    <i class="fa-solid fa-ban"></i> Deactivate Account
+                </button>
+                
+                <div class="divider"><span>OR</span></div>
+
+                <button id="confirmDeleteBtn" class="btn full btn-danger">
+                    <i class="fa-solid fa-trash"></i> Delete Permanently
+                </button>
+                
+                <button class="btn full close-delete btn-text">Cancel</button>
             </div>
             <span class="close-modal">&times;</span>
         </div>

@@ -209,10 +209,10 @@ function renderTable() {
             let badgeColor = '#888'; // Default grey
             const mood = user.emotional_state || 'Unknown';
             
-            // Simple logic for mood colors
-            if(mood === 'Excited' || mood === 'Happy') badgeColor = '#2ecc71'; // Green
+            // FIX: Updated logic to match Python API values
+            if(mood === 'Great' || mood === 'Good') badgeColor = '#2ecc71'; // Green
             else if(mood === 'Neutral') badgeColor = '#f1c40f'; // Yellow
-            else if(mood === 'Sad' || mood === 'Devastated') badgeColor = '#e74c3c'; // Red
+            else if(mood === 'Bad' || mood === 'Awful') badgeColor = '#e74c3c'; // Red
 
             tr.innerHTML = `
                 <td>#${user.id}</td>

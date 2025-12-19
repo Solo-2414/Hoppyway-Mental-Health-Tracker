@@ -146,8 +146,9 @@ def signin():
 
     user = User.query.filter_by(email=email).first()
     if not user: 
-        return render_template("index.html", login_error="email", message="Email not found", show_modal="signin")
-    
+        return render_template("index.html", login_error="email", message="Email not found", show_modal="signin")   
+    if user.status == 'disabled':
+        return render_template("index.html", login_error="email", message="Account disabled. Contact admin.", show_modal="signin")
     if not bcrypt.check_password_hash(user.password, password): 
         return render_template("index.html", login_error="password", message="Wrong password", show_modal="signin")
 
@@ -566,15 +567,28 @@ def api_all_users():
     
     for user in all_users:
         last_login = user.last_login.strftime("%Y-%m-%d %H:%M") if user.last_login else "Never"
+        # --- FIX IS HERE: Use user.status instead of "Active" ---
+        status_val = user.status.capitalize() if user.status else "Active"
+        
         users_data.append({
-            "id": user.id, "name": user.name, "username": user.username, "email": user.email,
-            "role": user.role.capitalize(), "status": "Active", "lastLogin": last_login
+            "id": user.id, 
+            "name": user.name, 
+            "username": user.username, 
+            "email": user.email,
+            "role": user.role.capitalize(), 
+            "status": status_val,
+            "lastLogin": last_login
         })
     
     for admin in admins:
         users_data.append({
-            "id": admin.admin_id, "name": "Admin", "username": admin.username, "email": admin.email,
-            "role": "Admin", "status": "Active", "lastLogin": "Never"
+            "id": admin.admin_id, 
+            "name": "Admin", 
+            "username": admin.username, 
+            "email": admin.email,
+            "role": "Admin", 
+            "status": "Active",
+            "lastLogin": "Never"
         })
     return jsonify(users_data)
 
@@ -591,6 +605,7 @@ def api_update_user(user_id):
     if 'username' in data: user.username = data['username']
     if 'email' in data: user.email = data['email']
     if 'role' in data: user.role = data['role'].lower()
+    if 'status' in data: user.status = data['status'].lower()
 
     try:
         db.session.commit()
@@ -613,21 +628,63 @@ def api_delete_user(user_id):
 @admin_required
 def api_add_user():
     data = request.get_json()
+
     if not all([data.get('name'), data.get('username'), data.get('email'), data.get('password'), data.get('role')]):
         return jsonify({"error": "Missing required fields"}), 400
     
-    if User.query.filter_by(email=data['email']).first():
+    role = data['role'].lower()
+    hashed_pw = bcrypt.generate_password_hash(data['password']).decode("utf-8")
+
+    if User.query.filter_by(email=data['email']).first() or Admin.query.filter_by(email=data['email']).first():
         return jsonify({"error": "Email already exists"}), 400
     
-    hashed_pw = bcrypt.generate_password_hash(data['password']).decode("utf-8")
-    new_user = User(name=data['name'], username=data['username'], email=data['email'], password=hashed_pw, role=data['role'].lower())
-    db.session.add(new_user)
-    db.session.commit()
-    
-    return jsonify({
-        "id": new_user.id, "name": new_user.name, "username": new_user.username,
-        "email": new_user.email, "role": new_user.role.capitalize(), "status": "Active", "lastLogin": "Never"
-    }), 201
+    if User.query.filter_by(username=data['username']).first() or Admin.query.filter_by(username=data['username']).first():
+        return jsonify({"error": "Username already exists"}), 400
+
+    try:
+        if role == 'admin':
+            new_admin = Admin(
+                username=data['username'], 
+                email=data['email'], 
+                password=hashed_pw
+            )
+            db.session.add(new_admin)
+            db.session.commit()
+            
+            return jsonify({
+                "id": new_admin.admin_id, 
+                "name": "Admin",
+                "username": new_admin.username,
+                "email": new_admin.email, 
+                "role": "Admin", 
+                "status": "Active", 
+                "lastLogin": "Never"
+            }), 201
+
+        else:
+            new_user = User(
+                name=data['name'], 
+                username=data['username'], 
+                email=data['email'], 
+                password=hashed_pw, 
+                role=role
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            
+            return jsonify({
+                "id": new_user.id, 
+                "name": new_user.name, 
+                "username": new_user.username,
+                "email": new_user.email, 
+                "role": new_user.role.capitalize(), 
+                "status": "Active", 
+                "lastLogin": "Never"
+            }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 # ---------------------------------
 # API: RECOMMENDED RESOURCES

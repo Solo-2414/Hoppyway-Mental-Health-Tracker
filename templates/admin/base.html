@@ -71,16 +71,6 @@
                             Dark Mode
                         </button>
 
-                        <button class="profile-btn">
-                            <span class="icon-circle"><i class="fa-solid fa-user"></i></span>
-                            My Profile
-                        </button>
-
-                        <button class="backup-btn">
-                            <span class="icon-circle"><i class="fa-solid fa-database"></i></span>
-                            Backup & Restore
-                        </button>
-
                         <div class="dropdown-divider"></div>
 
                         <button class="logout-btn">
@@ -124,59 +114,6 @@
         <footer>
             <p>&copy; 2025 HoppyWay. All rights reserved.</p>
         </footer>
-
-        <div id="profileModal" class="modal-overlay">
-            <div class="form-container">
-                <button class="close-btn">&times;</button>
-                <h1>Admin Profile</h1>
-                <p>Update your account details.</p>
-                
-                <form id="adminProfileForm">
-                    <div class="field">
-                        <label>Full Name</label>
-                        <input type="text" id="adminName" value="{{ user.name if user else '' }}" required />
-                    </div>
-                    <div class="field">
-                        <label>Email Address</label>
-                        <input type="email" id="adminEmail" value="{{ user.email if user else '' }}" required />
-                    </div>
-                    <div class="field">
-                        <label>New Password (Optional)</label>
-                        <input type="password" id="adminPassword" placeholder="Leave blank to keep current" />
-                    </div>
-                    <button type="submit">Save Changes</button>
-                </form>
-            </div>
-        </div>
-
-        <div id="backupModal" class="modal-overlay">
-            <div class="form-container">
-                <button class="close-btn">&times;</button>
-                <h1>System Backup</h1>
-                <p>Manage your database safety.</p>
-
-                <div class="backup-actions">
-                    <div class="action-card">
-                        <div class="icon-wrap download"><i class="fa-solid fa-download"></i></div>
-                        <h3>Export Data</h3>
-                        <p>Download a SQL copy of the database.</p>
-                        <button id="triggerBackupBtn" class="action-btn">Download Backup</button>
-                    </div>
-
-                    <hr class="divider-text" data-content="OR">
-
-                    <div class="action-card">
-                        <div class="icon-wrap upload"><i class="fa-solid fa-upload"></i></div>
-                        <h3>Restore Data</h3>
-                        <p>Upload a SQL file to restore data.</p>
-                        <form id="restoreForm">
-                            <input type="file" id="backupFile" accept=".sql" required />
-                            <button type="submit" class="action-btn outline">Restore from File</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <script src="/static/js/admin/script.js"></script>
     </body>

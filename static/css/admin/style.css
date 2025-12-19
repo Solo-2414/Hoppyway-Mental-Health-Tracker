@@ -41,16 +41,15 @@
 
 body {
     min-height: 100vh;
-    height: 100vh; /* FIX: Force body to take exact screen height */
+    height: 100vh;
     width: 100%;
     display: grid;
-    /* Grid structure: Header row / Content row / Footer row */
     grid-template-rows: 70px 1fr auto;
     grid-template-columns: 100px 1fr;
     background-color: var(--bg-color);
     color: var(--text-color);
     transition: grid-template-columns 0.3s ease;
-    overflow: hidden; /* FIX: Prevent the whole page from scrolling */
+    overflow: hidden;
 }
 
 body.sidebar-expanded {
@@ -67,7 +66,7 @@ header {
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 100; /* Ensure header stays above scrolling content */
+    z-index: 100;
 }
 
 header .left-panel {
@@ -155,17 +154,6 @@ header .icons i:hover {
 }
 
 .dark-mode .dropdown-arrow { border-bottom-color: rgba(30,30,30,0.8); }
-
-.dropdown-profile {
-    display: flex; align-items: center; gap: 15px; padding: 12px 18px;
-}
-
-.dropdown-profile img {
-    width: 50px; height: 50px; border-radius: 50%; object-fit: cover;
-}
-
-.dropdown-profile h4 { font-size: 17px; color: var(--text-color); }
-.dropdown-profile p { font-size: 14px; color: var(--grayish-color); margin-top: -2px; }
 
 .dropdown-divider {
     height: 1px; width: 85%; background: rgba(160,160,160,0.3);
@@ -273,7 +261,6 @@ header .icons i:hover {
 
 /* --- SIDEBAR (Fixed Left) --- */
 aside {
-    /* FIX: Make sidebar span from row 2 down to row 4 (bottom) */
     grid-row: 2 / 4; 
     grid-column: 1;
     width: 100px;
@@ -284,9 +271,9 @@ aside {
     align-items: center;
     box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
     transition: width 0.3s ease;
-    overflow-y: auto; /* Allow menu to scroll if screen is short */
+    overflow-y: auto;
     overflow-x: hidden;
-    background-color: var(--bg-color); /* Ensure background is solid */
+    background-color: var(--bg-color);
     z-index: 50;
 }
 
@@ -295,7 +282,7 @@ aside nav {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    width: 100%; /* Ensure nav takes full width of aside */
+    width: 100%;
 }
 
 aside nav ul {
@@ -315,7 +302,7 @@ aside nav ul li a {
     justify-content: center;
     align-items: center;
     gap: 15px;
-    padding: 10px 0; /* Add touch area */
+    padding: 10px 0;
 }
 
 aside nav ul li a span {
@@ -355,208 +342,20 @@ aside.expanded nav ul li a:hover {
 main {
     grid-row: 2;
     grid-column: 2;
-    /* FIX: Enable internal scrolling */
     overflow-y: auto; 
     height: 100%; 
     padding: 20px;
-    /* FIX: Changed to block so content starts at top and scrolls naturally */
     display: block; 
 }
 
 /* --- FOOTER (Fixed Bottom Right) --- */
 footer {
     grid-row: 3;
-    grid-column: 2; /* FIX: Sit to the right of the sidebar */
+    grid-column: 2;
     padding: 15px 20px;
     background-color: var(--bg-color);
     color: var(--grayish-color);
     text-align: center;
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     font-size: 14px;
-    /* Margin top auto is not needed here as grid places it at bottom */
 }
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active {
-    display: flex;
-    opacity: 1;
-}
-
-body.modal-open {
-    overflow: hidden !important;
-}
-
-/* Card Container */
-.form-container {
-    background: var(--container-bg-color);
-    width: 100%;
-    max-width: 500px;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    position: relative;
-    transform: scale(0.95);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-}
-
-.modal-overlay.active .form-container {
-    transform: scale(1);
-}
-
-.form-container h1 {
-    font-family: var(--newsreader-font);
-    font-size: 2rem;
-    color: var(--primary-color);
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.form-container p {
-    text-align: center;
-    color: var(--grayish-color);
-    margin-bottom: 25px;
-    font-size: 0.95rem;
-}
-
-/* Close Button */
-.close-btn {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    font-size: 1.8rem;
-    color: var(--grayish-color);
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.close-btn:hover { color: var(--error-color); }
-
-/* Form Fields */
-.form-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.form-container label {
-    font-weight: 600;
-    margin-bottom: 5px;
-    display: block;
-    color: var(--text-color);
-}
-
-.form-container input {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-size: 1rem;
-}
-
-.form-container button[type="submit"] {
-    margin-top: 10px;
-    padding: 14px;
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-.form-container button[type="submit"]:hover {
-    background-color: var(--primary-color-hover);
-}
-
-/* --- BACKUP SPECIFIC STYLES --- */
-.backup-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.action-card {
-    background: var(--bg-color);
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-}
-
-.icon-wrap {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 10px;
-    font-size: 1.2rem;
-}
-
-.icon-wrap.download { background: rgba(82, 196, 26, 0.1); color: var(--success-color); }
-.icon-wrap.upload { background: rgba(250, 173, 20, 0.1); color: var(--warning-color); }
-
-.action-card h3 { font-size: 1.1rem; margin-bottom: 5px; color: var(--text-color); }
-.action-card p { font-size: 0.85rem; margin-bottom: 15px; }
-
-.action-btn {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    background: var(--primary-color);
-    color: white;
-}
-
-.action-btn.outline {
-    background: transparent;
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-}
-.action-btn.outline:hover {
-    background: rgba(70, 94, 215, 0.1);
-}
-
-.divider-text {
-    border: 0;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-    height: 0px;
-    margin: 10px 0;
-    overflow: visible;
-}
-.divider-text::after {
-    content: attr(data-content);
-    position: relative;
-    top: -10px;
-    background: var(--container-bg-color);
-    padding: 0 10px;
-    color: var(--grayish-color);
-    font-size: 0.8rem;
-}
-
-#backupFile { margin-bottom: 10px; font-size: 0.9rem; }

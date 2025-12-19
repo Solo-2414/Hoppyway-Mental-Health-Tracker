@@ -9,7 +9,7 @@ const modal = document.getElementById("contentModal");
 const modalTitle = document.getElementById("modalTitle");
 const contentTypeSelect = document.getElementById("contentType");
 const titleInput = document.getElementById("contentTitle");
-const categoryInput = document.getElementById("contentCategory");
+const categoryInput = document.getElementById("contentCategory"); // This is now a <select>
 const descriptionInput = document.getElementById("contentDescription");
 const emotionContainer = document.getElementById("emotionSelectContainer");
 const emotionSelect = document.getElementById("emotionCategory");
@@ -85,8 +85,8 @@ if (!document.querySelector("style#manageContentStyles")) {
     #contentModal .modal-actions {
         display:flex; gap:10px; justify-content:flex-end; margin-top:16px;
     }
-    .btn-primary { background:var(--primary-color); color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; }
-    .btn-secondary { background:transparent; border:1px solid var(--border-color); padding:8px 12px; border-radius:8px; cursor:pointer; }
+    .btn-save { background:var(--primary-color); color:white; border:none; padding:8px 14px; border-radius:8px; cursor:pointer; }
+    .btn-cancel { background:transparent; border:1px solid var(--border-color); padding:8px 12px; border-radius:8px; cursor:pointer; color:var(--text-color); }
     .btn-action { background:transparent; border:none; padding:8px; cursor:pointer; color:var(--text-color); border-radius:8px; transition:background 0.12s; }
     .btn-action:hover { background: rgba(0,0,0,0.04); }
     .actions { display:flex; gap:6px; align-items:center; }
@@ -147,12 +147,15 @@ function renderTable(items = contents) {
         const typeDisplay = c.content_type === 'emotion' ? 'Emotion-Based' : 'Resource';
         const emotionDisplay = c.emotion ? ` • <em style="text-transform:capitalize;">${c.emotion.replace("_", " ")}</em>` : '';
 
+        // FIX: Ensure date_added is used correctly
+        const dateDisplay = c.date_added ? formatDate(c.date_added) : (c.created_at ? formatDate(c.created_at) : "N/A");
+
         tr.innerHTML = `
             <td>${c.id}</td>
             <td>${escapeHtml(c.title)}</td>
             <td style="text-transform:capitalize">${typeDisplay}</td>
             <td>${escapeHtml(c.category || "")}${c.content_type === "emotion" && c.emotion ? emotionDisplay : ""}</td>
-            <td>${formatDate(c.created_at)}</td>
+            <td>${dateDisplay}</td>
             <td class="actions">
                 <button class="btn-action edit-btn" data-id="${c.id}" title="Edit">
                     <i class="fa-solid fa-pen-to-square"></i>
@@ -175,10 +178,20 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// FIX: Improved Date Formatting
 function formatDate(dateStr) {
-    if (!dateStr) return '';
+    if (!dateStr) return 'N/A';
+    
+    // Check if format is "YYYY-MM-DD HH:MM" (from Python API)
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/)) {
+        return dateStr.split(' ')[0]; // Return just the date part
+    }
+
     try {
         const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+        
+        // Return YYYY-MM-DD
         return date.toISOString().split('T')[0];
     } catch (e) {
         return dateStr;
@@ -216,7 +229,8 @@ function hideModal() {
 function resetForm() {
     editId = null;
     titleInput.value = "";
-    categoryInput.value = "";
+    // Set default category
+    categoryInput.value = "Article"; 
     descriptionInput.value = "";
     mediaInput.value = "";
     emotionSelect.value = "happy";
@@ -257,7 +271,7 @@ document.addEventListener("keydown", (e) => {
 saveContentBtn.addEventListener("click", async () => {
     const contentType = contentTypeSelect.value;
     const title = titleInput.value.trim();
-    const category = categoryInput.value.trim();
+    const category = categoryInput.value; // Now gets value from SELECT
     const description = descriptionInput.value.trim();
     const media = mediaInput.value.trim();
     const emotion = contentType === "emotion" ? emotionSelect.value : null;
@@ -269,7 +283,7 @@ saveContentBtn.addEventListener("click", async () => {
         return;
     }
     if (!category) {
-        alert("Please enter a category (e.g. Article, Video).");
+        alert("Please select a category.");
         categoryInput.focus();
         return;
     }
@@ -360,7 +374,8 @@ async function handleEditClick(e) {
     saveContentBtn.textContent = "Update";
 
     titleInput.value = item.title;
-    categoryInput.value = item.category || "";
+    // Set SELECT value (ensure casing matches options)
+    categoryInput.value = item.category || "Article"; 
     descriptionInput.value = item.description;
     mediaInput.value = item.media_url || "";
     contentTypeSelect.value = item.content_type;
@@ -397,7 +412,6 @@ searchContentInput.addEventListener("input", () => {
     });
 
     renderTable(filtered);
-});
 
 /* ===========================
    Expose API for user pages
@@ -424,3 +438,4 @@ window.getContentForEmotion = async function (emotionKey) {
         return [];
     }
 };
+});
