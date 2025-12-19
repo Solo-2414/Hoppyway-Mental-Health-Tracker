@@ -1,10 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // --- DOM Elements ---
     const emotionContainer = document.querySelector(".emotion-container");
     const reCheckinContainer = document.querySelector(".re-checkin-container");
     const btnCheckInAgain = document.getElementById("btn-check-in-again");
     const periodTextSpan = document.getElementById("current-period-text");
     const userIdEl = document.getElementById("user-identity");
 
+    // Mood Modal
     const moodModal = document.getElementById("moodDetailModal");
     const closeModal = document.querySelector(".close-modal");
     const stressSlider = document.getElementById("stress-slider");
@@ -12,51 +14,63 @@ document.addEventListener("DOMContentLoaded", () => {
     const moodNotes = document.getElementById("mood-notes");
     const btnSubmitMood = document.getElementById("btn-submit-mood");
 
+    // Journal Modal
     const journalModal = document.getElementById("journalModal");
     const openJournalBtn = document.getElementById("open-journal-btn");
     const closeJournalBtn = document.getElementById("close-journal");
     const journalForm = document.getElementById("journal-form");
 
+    // Breathing Modal
+    const breathingModal = document.getElementById("breathingModal");
+    const openBreathingBtn = document.getElementById("start-breathing-btn");
+    const closeBreathingBtn = document.getElementById("close-breathing");
+    const startBreathBtn = document.getElementById("begin-session-btn");
+    const stopBreathBtn = document.getElementById("stop-breathing-btn"); 
+    const breathContainer = document.getElementById("breathing-container");
+    const breathText = document.getElementById("breath-text");
+    const timerDisplay = document.getElementById("breath-timer");
+
+    // Tips Modal
+    const tipsModal = document.getElementById("tipsModal");
+    const openTipsBtn = document.getElementById("open-tips-btn");
+    const closeTipsBtn = document.getElementById("close-tips");
+    const slides = document.querySelectorAll(".tip-slide");
+    const dots = document.querySelectorAll(".dot");
+    const prevBtn = document.getElementById("prev-tip");
+    const nextBtn = document.getElementById("next-tip");
+
     let selectedMoodValue = null;
     let userId = userIdEl ? userIdEl.getAttribute("data-user-id") : "guest";
 
-    const breathingModal = document.getElementById("breathingModal");
-    const openBtn = document.getElementById("start-breathing-btn");
-    const closeBtn = document.getElementById("close-breathing");
+    // --- HELPER: Modal Toggle (The Fix) ---
+    function openModal(modal) {
+        if (!modal) return;
+        modal.classList.add("show");
+    }
 
-    const startBtn = document.getElementById("begin-session-btn");
-    const stopBtn = document.getElementById("stop-breathing-btn"); 
- 
-    const container = document.getElementById("breathing-container");
-    const text = document.getElementById("breath-text");
-    const timerDisplay = document.getElementById("breath-timer");
+    function closeModalFunc(modal) {
+        if (!modal) return;
+        modal.classList.remove("show");
+    }
 
+    // --- BREATHING LOGIC ---
     const totalTime = 7500; 
     const breatheTime = 3000;
     const holdTime = 1500;
-    
-    let breathingInterval;
-    let countdownInterval;
-  
-    let holdTimeout;
-    let exhaleTimeout;
-    
+    let breathingInterval, countdownInterval, holdTimeout, exhaleTimeout;
     let timeLeft = 120; 
 
     function breathAnimation() {
-        if (!container) return;
-
-        text.innerText = 'Breathe In';
-        container.className = 'breathing-container grow';
+        if (!breathContainer) return;
+        breathText.innerText = 'Breathe In';
+        breathContainer.className = 'breathing-container grow';
 
         holdTimeout = setTimeout(() => {
-            text.innerText = 'Hold';
-
+            breathText.innerText = 'Hold';
             exhaleTimeout = setTimeout(() => {
-                text.innerText = 'Breathe Out';
-                container.className = 'breathing-container shrink';
+                breathText.innerText = 'Breathe Out';
+                breathContainer.className = 'breathing-container shrink';
             }, holdTime);
-
         }, breatheTime);
     }
 
@@ -75,34 +89,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function startSession() {
-        startBtn.style.display = "none";
-        stopBtn.style.display = "inline-block";
+        startBreathBtn.style.display = "none";
+        stopBreathBtn.style.display = "inline-block";
         timerDisplay.style.color = "var(--primary-color)";
-        
         timeLeft = 120; 
         updateTimer(); 
-
         breathAnimation();
         breathingInterval = setInterval(breathAnimation, totalTime);
-
         countdownInterval = setInterval(updateTimer, 1000);
     }
 
     function stopSession() {
         clearInterval(breathingInterval);
         clearInterval(countdownInterval);
-
         clearTimeout(holdTimeout);
         clearTimeout(exhaleTimeout);
 
-        container.className = "breathing-container"; 
-        text.innerText = "Ready?";
-        timerDisplay.innerText = "2:00";
-        timerDisplay.style.color = "var(--primary-color)";
+        if(breathContainer) breathContainer.className = "breathing-container"; 
+        if(breathText) breathText.innerText = "Ready?";
+        if(timerDisplay) {
+            timerDisplay.innerText = "2:00";
+            timerDisplay.style.color = "var(--primary-color)";
+        }
         
-        startBtn.style.display = "inline-block";
-        startBtn.innerText = "Start Exercise";
-        stopBtn.style.display = "none";
+        if(startBreathBtn) {
+            startBreathBtn.style.display = "inline-block";
+            startBreathBtn.innerText = "Start Exercise";
+        }
+        if(stopBreathBtn) stopBreathBtn.style.display = "none";
     }
 
     function finishExercise() {
@@ -111,62 +125,53 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(holdTimeout);
         clearTimeout(exhaleTimeout);
         
-        container.className = "breathing-container";
-        text.innerText = "Great Job!";
+        breathContainer.className = "breathing-container";
+        breathText.innerText = "Great Job!";
         timerDisplay.innerText = "Complete";
         timerDisplay.style.color = "#2ecc71"; 
         
-        stopBtn.style.display = "none";
-        startBtn.style.display = "inline-block";
-        startBtn.innerText = "Do it again";
+        stopBreathBtn.style.display = "none";
+        startBreathBtn.style.display = "inline-block";
+        startBreathBtn.innerText = "Do it again";
     }
 
-    if (openBtn) {
-        openBtn.addEventListener("click", () => {
-            breathingModal.style.display = "flex";
+    // Breathing Listeners
+    if (openBreathingBtn) {
+        openBreathingBtn.addEventListener("click", () => {
+            openModal(breathingModal);
             stopSession(); 
         });
     }
-
-    if (startBtn) startBtn.addEventListener("click", startSession);
-    if (stopBtn) stopBtn.addEventListener("click", stopSession);
-
-    if (closeBtn) {
-        closeBtn.addEventListener("click", () => {
+    if (closeBreathingBtn) {
+        closeBreathingBtn.addEventListener("click", () => {
             stopSession();
-            breathingModal.style.display = "none";
+            closeModalFunc(breathingModal);
         });
     }
-
-    window.addEventListener("click", (e) => {
-        if (e.target === breathingModal) {
-            stopSession();
-            breathingModal.style.display = "none";
-        }
-    });
+    if (startBreathBtn) startBreathBtn.addEventListener("click", startSession);
+    if (stopBreathBtn) stopBreathBtn.addEventListener("click", stopSession);
 
 
-if (openJournalBtn) {
+    // --- JOURNAL LOGIC ---
+    if (openJournalBtn) {
         openJournalBtn.addEventListener("click", () => {
-            journalModal.style.display = "flex";
+            openModal(journalModal);
         });
     }
-
     if (closeJournalBtn) {
         closeJournalBtn.addEventListener("click", () => {
-            journalModal.style.display = "none";
+            closeModalFunc(journalModal);
         });
     }
 
     if (journalForm) {
         journalForm.addEventListener("submit", (e) => {
             e.preventDefault();
-
             const title = document.getElementById("journal-title").value;
             const entry = document.getElementById("journal-entry").value;
             const submitBtn = journalForm.querySelector("button");
-
             const originalText = submitBtn.innerText;
+
             submitBtn.innerText = "Saving...";
             submitBtn.disabled = true;
 
@@ -179,7 +184,7 @@ if (openJournalBtn) {
             .then(data => {
                 if (data.status === "success") {
                     journalForm.reset();
-                    journalModal.style.display = "none";
+                    closeModalFunc(journalModal);
                     alert("Journal entry saved successfully!");
                 } else {
                     alert("Error saving journal.");
@@ -193,19 +198,8 @@ if (openJournalBtn) {
         });
     }
 
-    // ============================
-    // 2. TIPS CAROUSEL LOGIC
-    // ============================
-    const tipsModal = document.getElementById("tipsModal");
-    const openTipsBtn = document.getElementById("open-tips-btn");
-    const closeTipsBtn = document.getElementById("close-tips");
-    
-    const slides = document.querySelectorAll(".tip-slide");
-    const dots = document.querySelectorAll(".dot");
-    const prevBtn = document.getElementById("prev-tip");
-    const nextBtn = document.getElementById("next-tip");
+    // --- TIPS CAROUSEL LOGIC ---
     let currentSlide = 0;
-
     function showSlide(index) {
         if (index >= slides.length) currentSlide = 0;
         else if (index < 0) currentSlide = slides.length - 1;
@@ -220,28 +214,33 @@ if (openJournalBtn) {
 
     if (openTipsBtn) {
         openTipsBtn.addEventListener("click", () => {
-            tipsModal.style.display = "flex";
+            openModal(tipsModal);
             currentSlide = 0; 
             showSlide(0);
         });
     }
-
     if (closeTipsBtn) {
         closeTipsBtn.addEventListener("click", () => {
-            tipsModal.style.display = "none";
+            closeModalFunc(tipsModal);
         });
     }
-
     if (nextBtn) nextBtn.addEventListener("click", () => showSlide(currentSlide + 1));
     if (prevBtn) prevBtn.addEventListener("click", () => showSlide(currentSlide - 1));
 
+
+    // --- GLOBAL CLOSE ON CLICK OUTSIDE ---
     window.addEventListener("click", (e) => {
-        if (e.target === journalModal) journalModal.style.display = "none";
-        if (e.target === tipsModal) tipsModal.style.display = "none";
+        if (e.target === breathingModal) {
+            stopSession();
+            closeModalFunc(breathingModal);
+        }
+        if (e.target === journalModal) closeModalFunc(journalModal);
+        if (e.target === tipsModal) closeModalFunc(tipsModal);
+        if (e.target === moodModal) closeModalFunc(moodModal);
     });
 
-    
 
+    // --- MOOD CHECK-IN LOGIC ---
     const now = new Date();
     const hour = now.getHours();
     let currentPeriod = "morning";
@@ -261,6 +260,7 @@ if (openJournalBtn) {
     const storageKey = `hoppy_mood_${userId}_${todayStr}_${currentPeriod}`;
     const alreadyLogged = localStorage.getItem(storageKey);
 
+    // Initial Display Logic
     if (alreadyLogged) {
         if(emotionContainer) emotionContainer.style.display = "none";
         if(reCheckinContainer) reCheckinContainer.style.display = "flex"; 
@@ -268,7 +268,7 @@ if (openJournalBtn) {
         if(emotionContainer) emotionContainer.style.display = "block";
         if(reCheckinContainer) reCheckinContainer.style.display = "none";
     }
--
+
     if (btnCheckInAgain) {
         btnCheckInAgain.addEventListener("click", () => {
             reCheckinContainer.style.display = "none";
@@ -280,12 +280,10 @@ if (openJournalBtn) {
     document.querySelectorAll(".emotion").forEach((emotion) => {
         emotion.addEventListener("click", function() {
             selectedMoodValue = this.getAttribute("data-value");
-
             stressSlider.value = 1;
             stressDisplay.innerText = "1";
             moodNotes.value = "";
-            
-            moodModal.style.display = "flex";
+            openModal(moodModal);
         });
     });
 
@@ -297,15 +295,9 @@ if (openJournalBtn) {
 
     if(closeModal) {
         closeModal.addEventListener("click", () => {
-            moodModal.style.display = "none";
+            closeModalFunc(moodModal);
         });
     }
-
-    window.addEventListener("click", (e) => {
-        if (e.target === moodModal) {
-            moodModal.style.display = "none";
-        }
-    });
 
     if(btnSubmitMood) {
         btnSubmitMood.addEventListener("click", () => {
@@ -325,8 +317,7 @@ if (openJournalBtn) {
             })
             .then((res) => {
                 if (res.ok) {
-                    moodModal.style.display = "none";
-
+                    closeModalFunc(moodModal);
                     localStorage.setItem(storageKey, "true");
 
                     emotionContainer.classList.add("fade-out");
@@ -334,10 +325,8 @@ if (openJournalBtn) {
                     setTimeout(() => {
                         emotionContainer.style.display = "none";
                         emotionContainer.classList.remove("fade-out");
-
                         reCheckinContainer.style.display = "flex";
                         reCheckinContainer.classList.add("fade-in");
-
                     }, 400);
 
                 } else {
@@ -348,4 +337,3 @@ if (openJournalBtn) {
         });
     }
 });
-

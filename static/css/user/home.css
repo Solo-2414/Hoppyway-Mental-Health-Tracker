@@ -372,24 +372,31 @@ body.dark-mode .log-item { border-bottom-color: rgba(255,255,255,0.05); }
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw; /* Force full viewport width */
-    height: 100vh; /* Force full viewport height */
+    width: 100%;
+    height: 100%;
     
-    /* Make background darker and force it to show */
-    background-color: rgba(0, 0, 0, 0.6) !important;
+    /* Background & Layout */
+    background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     
-    /* Flexbox centering */
-    display: none; /* Hidden by default */
+    /* Hidden State */
+    display: none; 
+    opacity: 0;
+    pointer-events: none;
+    
+    /* Centering */
     justify-content: center;
     align-items: center;
-    
-    /* Z-Index must be higher than Header (100) and everything else */
-    z-index: 9998 !important; 
-    
-    /* Ensure opacity is not 0 */
-    opacity: 1 !important;
-    visibility: visible !important;
+    z-index: 2000;
+    transition: opacity 0.3s ease;
+}
+
+/* Visible State */
+.modal-overlay.show {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .modal-content {
@@ -398,216 +405,103 @@ body.dark-mode .log-item { border-bottom-color: rgba(255,255,255,0.05); }
     border-radius: 24px;
     width: 90%;
     max-width: 450px;
-    
-    /* Strong shadow to make it pop */
     box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-    
     position: relative;
-    /* Content must sit ON TOP of the overlay */
-    z-index: 9999 !important; 
-    
     color: var(--text-color);
     
-    /* Prevent animation transforms from shrinking it to 0 */
-    transform: scale(1) !important; 
-    opacity: 1 !important;
+    /* Animation Start State */
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.modal-content h2 { text-align: center; font-family: 'Newsreader', serif; font-size: 2rem; margin-bottom: 25px; color: var(--primary-color); }
-.close-modal { position: absolute; top: 20px; right: 25px; font-size: 1.5rem; cursor: pointer; color: var(--grayish-color); z-index: 10000; }
-.modern-btn { background-color: var(--primary-color); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; }
+.modal-overlay.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-content h2 { 
+    text-align: center; 
+    font-family: 'Newsreader', serif; 
+    font-size: 2rem; 
+    margin-bottom: 25px; 
+    color: var(--primary-color); 
+}
+
+.close-modal { 
+    position: absolute; 
+    top: 20px; 
+    right: 25px; 
+    font-size: 1.5rem; 
+    cursor: pointer; 
+    color: var(--grayish-color); 
+    transition: color 0.2s;
+}
+.close-modal:hover { color: #e74c3c; }
+
+.modern-btn { background-color: var(--primary-color); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+.modern-btn:hover { transform: translateY(-2px); opacity: 0.9; }
 .modern-btn.full-width { width: 100%; margin-top: 15px; border-radius: 12px; }
 input[type=range] { width: 100%; accent-color: var(--primary-color); }
 .slider-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--grayish-color); margin-top: 5px; }
-textarea { width: 100%; padding: 10px; border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); border-radius: 8px; font-family: inherit; }
+textarea { width: 100%; padding: 10px; border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); border-radius: 8px; font-family: inherit; resize: vertical; }
 textarea:focus { outline: 1px solid var(--primary-color); }
+.input-group { margin-bottom: 15px; }
 .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-color); }
-
+#journal-title { width: 100%; padding: 12px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 1rem; background: var(--input-bg); color: var(--text-color); margin-bottom: 5px; font-weight: 600; }
 
 /* --- BREATHING EXERCISE STYLES --- */
-
-/* Special Modal Layout */
 .timer-display {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    font-family: 'Inter', sans-serif; /* Monospace font looks better for numbers if available, else Inter is fine */
-    margin-bottom: 10px;
+    font-size: 2.5rem; font-weight: 700; color: var(--primary-color);
+    font-family: 'Inter', sans-serif; margin-bottom: 10px;
 }
-
 .secondary-btn {
-    background-color: transparent;
-    border: 2px solid #ddd;
-    color: var(--grayish-color);
-    margin-top: 10px;
+    background-color: transparent; border: 2px solid #ddd; color: var(--grayish-color); margin-top: 10px;
 }
-
-.secondary-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background-color: transparent;
-}
-
+.secondary-btn:hover { border-color: var(--primary-color); color: var(--primary-color); background-color: transparent; }
 .breathing-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly; /* Distributes vertical space */
-    padding: 30px;
-    text-align: center;
-    min-height: 400px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Soothing gradient */
+    display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
+    padding: 30px; text-align: center; min-height: 400px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
-
-/* The Animation Container */
 .breathing-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    width: 200px;
-    position: relative;
-    margin: 30px 0;
-    transform: scale(1);
+    display: flex; align-items: center; justify-content: center;
+    height: 200px; width: 200px; position: relative;
+    margin: 30px 0; transform: scale(1);
 }
-
-/* The Circle */
 .circle {
-    background-color: var(--primary-color); /* Uses your primary blue */
-    height: 100%;
-    width: 100%;
-    border-radius: 50%;
-    position: absolute;
-    z-index: 1;
-    opacity: 0.8;
-    box-shadow: 0 0 20px rgba(70, 94, 215, 0.4);
-    
-    /* Default State */
-    transform: scale(0.3); 
-}
-
-/* Text inside the circle */
-#breath-text {
-    position: relative;
-    z-index: 2;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: bold;
-    font-family: 'Inter', sans-serif;
-    pointer-events: none;
-}
-
-.breath-instruction {
-    color: #555;
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-}
-
-/* --- ANIMATION CLASSES (Toggled by JS) --- */
-
-/* 1. Expand (Inhale) */
-.breathing-container.grow .circle {
-    transform: scale(1);
-    transition: transform 3s ease-in-out; /* 3 seconds In */
-}
-
-/* 2. Hold (Stay Expanded) */
-.breathing-container.hold .circle {
-    transform: scale(1);
-    /* No transition change needed, it just stays there */
-}
-
-/* 3. Shrink (Exhale) */
-.breathing-container.shrink .circle {
+    background-color: var(--primary-color); height: 100%; width: 100%; border-radius: 50%;
+    position: absolute; z-index: 1; opacity: 0.8; box-shadow: 0 0 20px rgba(70, 94, 215, 0.4);
     transform: scale(0.3);
-    transition: transform 3s ease-in-out; /* 3 seconds Out */
 }
+#breath-text { position: relative; z-index: 2; color: white; font-size: 1.2rem; font-weight: bold; font-family: 'Inter', sans-serif; pointer-events: none; }
+.breath-instruction { color: #555; font-size: 0.9rem; margin-bottom: 20px; }
+.breathing-container.grow .circle { transform: scale(1); transition: transform 3s ease-in-out; }
+.breathing-container.hold .circle { transform: scale(1); }
+.breathing-container.shrink .circle { transform: scale(0.3); transition: transform 3s ease-in-out; }
 
 /* --- JOURNAL MODAL --- */
-.journal-content {
-    max-width: 500px;
-    text-align: left;
-}
-.modal-subtitle {
-    color: var(--grayish-color);
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-    margin-top: -15px; /* Pull closer to header */
-}
-#journal-title {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--input-border);
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    background: var(--input-bg);
-    color: var(--text-color);
-    margin-bottom: 5px;
-    font-weight: 600;
-}
-#journal-entry {
-    resize: none; /* Prevent manual resizing breaking layout */
-}
+.journal-content { max-width: 500px; text-align: left; }
+.modal-subtitle { color: var(--grayish-color); font-size: 0.9rem; margin-bottom: 20px; margin-top: -15px; }
+#journal-entry { resize: none; }
 
 /* --- TIPS MODAL (CAROUSEL) --- */
 .tips-content {
-    max-width: 400px;
-    text-align: center;
-    padding: 40px 30px;
-    background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%); /* Warm background for tips */
+    max-width: 400px; text-align: center; padding: 40px 30px;
+    background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%);
 }
-/* Override dark mode background for tips */
-body.dark-mode .tips-content {
-    background: linear-gradient(135deg, #4a3b2a 0%, #242526 100%);
-}
-
-.tips-carousel {
-    min-height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.tip-slide {
-    display: none; /* Hidden by default */
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    animation: fadeInSlide 0.4s ease;
-}
+body.dark-mode .tips-content { background: linear-gradient(135deg, #4a3b2a 0%, #242526 100%); }
+.tips-carousel { min-height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.tip-slide { display: none; flex-direction: column; align-items: center; gap: 15px; animation: fadeInSlide 0.4s ease; }
 .tip-slide.active { display: flex; }
-
 .tip-icon {
-    width: 70px; height: 70px;
-    background: white; border-radius: 50%;
+    width: 70px; height: 70px; background: white; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; color: #e65100;
-    box-shadow: 0 5px 15px rgba(230, 81, 0, 0.2);
+    font-size: 2rem; color: #e65100; box-shadow: 0 5px 15px rgba(230, 81, 0, 0.2);
 }
 .tip-slide h3 { font-size: 1.5rem; color: var(--text-color); margin: 0; }
 .tip-slide p { font-size: 1rem; color: var(--grayish-color); line-height: 1.5; }
-
-/* Carousel Controls */
-.tips-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 10px;
-}
-
-.icon-btn {
-    background: none; border: none; font-size: 1.2rem;
-    color: var(--grayish-color); cursor: pointer; padding: 10px;
-    transition: color 0.2s;
-}
+.tips-controls { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 10px; }
+.icon-btn { background: none; border: none; font-size: 1.2rem; color: var(--grayish-color); cursor: pointer; padding: 10px; transition: color 0.2s; }
 .icon-btn:hover { color: var(--primary-color); }
-
 .dots-indicator { display: flex; gap: 8px; }
-.dot {
-    width: 8px; height: 8px; background: #ddd; border-radius: 50%;
-    transition: background 0.3s;
-}
+.dot { width: 8px; height: 8px; background: #ddd; border-radius: 50%; transition: background 0.3s; }
 .dot.active { background: var(--primary-color); transform: scale(1.2); }
