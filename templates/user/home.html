@@ -6,19 +6,6 @@
 <div id="user-identity" data-user-id="{{ session['user_id'] }}"></div>
 
 <div class="home-dashboard">
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-container">
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">
-                        {{ message }}
-                        <span onclick="this.parentElement.style.display='none'" style="float:right; cursor:pointer;">&times;</span>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
 
     <div class="dashboard-header">
         <h4>Overview</h4>

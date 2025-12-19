@@ -8,8 +8,14 @@
     <div class="resources-header">
         <h1 class="page-title">Mental Health Resources</h1>
         <p class="page-subtitle">
-            Curated articles, videos, and guides to support your journey.
+            Curated content to support your journey.
         </p>
+        
+        <div id="moodContext" style="display:none; margin-top: 15px;">
+            <span style="background: rgba(70, 94, 215, 0.1); color: var(--primary-color); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                <i class="fa-solid fa-heart-pulse"></i> Recommended for: <span id="moodText"></span>
+            </span>
+        </div>
     </div>
 
     <div class="resources-grid" id="resourcesContainer">
@@ -22,21 +28,30 @@
 <script>
     async function loadResources() {
         const container = document.getElementById("resourcesContainer");
+        const moodContext = document.getElementById("moodContext");
+        const moodText = document.getElementById("moodText");
         
         try {
-            const response = await fetch("/api/content/resources");
+            // CALL THE NEW API ENDPOINT
+            const response = await fetch("/api/content/recommended");
             if (!response.ok) throw new Error("Failed to load resources");
 
-            const resources = await response.json();
+            const data = await response.json();
+            const resources = data.resources;
 
-            // Clear skeletons
+            // Update Header based on Mood
+            if (data.current_mood && data.current_mood !== "General") {
+                moodText.textContent = data.current_mood + " Mood";
+                moodContext.style.display = "block";
+            }
+
             container.innerHTML = "";
 
             if (resources.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fa-solid fa-folder-open"></i>
-                        <p>No resources available at the moment.</p>
+                        <p>No specific resources found for your current status.</p>
                     </div>`;
                 return;
             }
@@ -45,7 +60,7 @@
                 const card = document.createElement("div");
                 card.className = "resource-card fade-in";
 
-                // 1. Determine Media (Video or Link)
+                // Handle YouTube Embeds
                 let mediaContent = "";
                 if (resource.media_url) {
                     const embedUrl = getYouTubeEmbed(resource.media_url);
@@ -63,11 +78,19 @@
                     }
                 }
 
-                // 2. Build Card HTML
+                // Determine if it's a specific Emotion Recommendation
+                let badgeClass = "category-badge";
+                let badgeText = resource.category || 'General';
+                
+                // If the resource has a specific emotion tag, show it
+                if (resource.emotion) {
+                    badgeText += ` • ${capitalize(resource.emotion)}`;
+                }
+
                 card.innerHTML = `
                     ${mediaContent}
                     <div class="card-content">
-                        <span class="category-badge">${escapeHtml(resource.category || 'General')}</span>
+                        <span class="${badgeClass}">${escapeHtml(badgeText)}</span>
                         <h3>${escapeHtml(resource.title)}</h3>
                         <p>${escapeHtml(resource.description)}</p>
                         
@@ -83,11 +106,10 @@
 
         } catch (error) {
             console.error("Error:", error);
-            container.innerHTML = `<p class="error-msg">Failed to load resources. Please try again later.</p>`;
+            container.innerHTML = `<p class="error-msg">Failed to load resources.</p>`;
         }
     }
 
-    // Helper: Escape HTML to prevent XSS
     function escapeHtml(text) {
         if (!text) return "";
         const div = document.createElement("div");
@@ -95,7 +117,10 @@
         return div.innerHTML;
     }
 
-    // Helper: Get YouTube Embed URL
+    function capitalize(s) {
+        return s && s[0].toUpperCase() + s.slice(1);
+    }
+
     function getYouTubeEmbed(url) {
         try {
             if (!url) return null;

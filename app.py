@@ -630,6 +630,62 @@ def api_add_user():
     }), 201
 
 # ---------------------------------
+# API: RECOMMENDED RESOURCES
+# ---------------------------------
+@app.route('/api/content/recommended', methods=['GET'])
+@login_required
+def api_get_recommended_resources():
+    user_id = session.get('user_id')
+
+    latest_log = MoodLog.query.filter_by(user_id=user_id).order_by(MoodLog.created_at.desc()).first()
+
+    mood_map = {
+        1: 'happy', 
+        2: 'okay',    
+        3: 'neutral', 
+        4: 'sad',    
+        5: 'very_sad' 
+    }
+    
+    user_emotion_key = None
+    user_emotion_label = "General"
+
+    if latest_log:
+        user_emotion_key = mood_map.get(latest_log.mood_value)
+
+        label_map = {
+            1: "Great", 
+            2: "Good", 
+            3: "Neutral", 
+            4: "Bad", 
+            5: "Devastated"
+        }
+        user_emotion_label = label_map.get(latest_log.mood_value, "General")
+
+    if user_emotion_key:
+        contents = Content.query.filter(
+            or_(
+                Content.emotion == user_emotion_key, 
+                Content.emotion == None,         
+                Content.emotion == ""    
+            )
+        ).order_by(Content.created_at.desc()).all()
+    else:
+        contents = Content.query.order_by(Content.created_at.desc()).all()
+
+    return jsonify({
+        "current_mood": user_emotion_label,
+        "resources": [{
+            "id": c.id, 
+            "title": c.title, 
+            "description": c.description, 
+            "category": c.category, 
+            "emotion": c.emotion,
+            "media_url": c.media_url
+        } for c in contents]
+    })
+
+# ---------------------------------
 # CHART API ROUTES
 # ---------------------------------
 @app.route('/api/chart/mood_distribution', methods=['GET'])
