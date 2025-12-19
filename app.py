@@ -427,7 +427,7 @@ def api_poll_notifications():
     notif_list = []
     for n in recent_notifs:
         notif_list.append({
-            'id': n.id,
+            'id': n.notif_id,
             'message': n.message,
             'time': n.created_at.strftime('%b %d, %I:%M %p')
         })

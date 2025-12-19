@@ -3,43 +3,147 @@ let users = [];
 let currentPage = 1;
 const rowsPerPage = 10;
 
-// DOM Elements
-const userTableBody = document.getElementById("userTableBody");
-const addUserBtn = document.getElementById("addUserBtn");
-const addUserModal = document.getElementById("addUserModal");
-const addUserForm = document.getElementById("addUserForm");
-const searchInput = document.getElementById("searchUser");
-const filterRole = document.getElementById("filterRole");
-const filterStatus = document.getElementById("filterStatus");
-
 // Dynamic Modals Containers
 let editUserModal, viewUserModal, deleteUserModal;
 
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // --- 1. DOM ELEMENTS (Selected after DOM is ready) ---
+    const userTableBody = document.getElementById("userTableBody");
+    const addUserBtn = document.getElementById("addUserBtn");
+    const addUserModal = document.getElementById("addUserModal");
+    const addUserForm = document.getElementById("addUserForm");
+    
+    const searchInput = document.getElementById("searchUser");
+    const filterRole = document.getElementById("filterRole");
+    const filterStatus = document.getElementById("filterStatus");
+
+    // --- 2. INITIAL FETCH ---
+    fetchUsers();
+
+    // --- 3. EVENT LISTENERS: ADD USER ---
+    if (addUserBtn && addUserModal) {
+        addUserBtn.addEventListener("click", () => {
+            openModal(addUserModal);
+        });
+
+        // Close button inside modal
+        const closeBtn = addUserModal.querySelector(".close-modal");
+        if (closeBtn) {
+            closeBtn.addEventListener("click", () => {
+                closeModal(addUserModal);
+            });
+        }
+    }
+
+    if (addUserForm) {
+        addUserForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = addUserForm.querySelector("button[type='submit']");
+            const originalText = btn.innerText;
+            btn.innerText = "Adding...";
+            
+            const inputs = addUserForm.querySelectorAll("input, select");
+            const newUser = {
+                name: inputs[0].value,
+                username: inputs[1].value,
+                email: inputs[2].value,
+                password: inputs[3].value,
+                role: inputs[4].value
+            };
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newUser)
+                });
+
+                if (response.ok) {
+                    alert("User created successfully!");
+                    closeModal(addUserModal);
+                    addUserForm.reset();
+                    fetchUsers(); 
+                } else {
+                    const err = await response.json();
+                    alert("Error: " + err.error);
+                }
+            } catch (error) {
+                console.error("Add user failed:", error);
+            } finally {
+                btn.innerText = originalText;
+            }
+        });
+    }
+
+    // --- 4. EVENT LISTENERS: FILTERS & PAGINATION ---
+    if(searchInput) searchInput.addEventListener("input", () => { currentPage = 1; applyFilters(); });
+    if(filterRole) filterRole.addEventListener("change", () => { currentPage = 1; applyFilters(); });
+    if(filterStatus) filterStatus.addEventListener("change", () => { currentPage = 1; applyFilters(); });
+
+    document.getElementById("prevPage")?.addEventListener("click", () => {
+        if (currentPage > 1) { currentPage--; applyFilters(); }
+    });
+    document.getElementById("nextPage")?.addEventListener("click", () => {
+        const totalPages = Math.ceil(window.currentDataSetLength / rowsPerPage);
+        if (currentPage < totalPages) { currentPage++; applyFilters(); }
+    });
+
+    // --- 5. EVENT DELEGATION FOR TABLE ACTIONS ---
+    if (userTableBody) {
+        userTableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('.action-btn');
+            if (!btn) return;
+
+            const id = parseInt(btn.dataset.id);
+
+            if (btn.classList.contains('view')) openViewUser(id);
+            else if (btn.classList.contains('edit')) openEditUser(id);
+            else if (btn.classList.contains('delete')) openDeleteUser(id);
+        });
+    }
+});
+
 // ==========================
-// 1. FETCH DATA FROM DB
+// HELPER FUNCTIONS (Outside DOMContentLoaded so they are cleaner)
 // ==========================
+
+// --- Modal Helpers ---
+function openModal(modal) {
+    if(!modal) return;
+    modal.style.display = "flex";
+    // Small delay to allow display:flex to apply before adding opacity class
+    setTimeout(() => { modal.classList.add("active"); }, 10);
+    // document.body.style.overflow = "hidden"; // Optional: Prevent background scrolling
+}
+
+function closeModal(modal) {
+    if(!modal) return;
+    modal.classList.remove("active");
+    // Wait for transition to finish
+    setTimeout(() => { modal.style.display = "none"; }, 300);
+    // document.body.style.overflow = "";
+}
+
+// --- Fetch Data ---
 async function fetchUsers() {
+    const userTableBody = document.getElementById("userTableBody");
     try {
         const response = await fetch('/api/all_users');
         if (!response.ok) throw new Error("Failed to fetch users");
-        
         users = await response.json();
-        
-        // Initial Render
         applyFilters(); 
     } catch (error) {
         console.error("Error:", error);
-        userTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Error loading data</td></tr>`;
+        if(userTableBody) userTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Error loading data</td></tr>`;
     }
 }
 
-// Load on start
-document.addEventListener("DOMContentLoaded", fetchUsers);
-
-// ==========================
-// 2. RENDER & PAGINATION
-// ==========================
+// --- Render Table ---
 function renderTable(data) {
+    const userTableBody = document.getElementById("userTableBody");
+    if(!userTableBody) return;
+    
     userTableBody.innerHTML = "";
 
     if (data.length === 0) {
@@ -49,10 +153,8 @@ function renderTable(data) {
 
     data.forEach((u) => {
         const row = document.createElement("tr");
-        
-        // Ensure role is capitalized for display
-        const displayRole = u.role.charAt(0).toUpperCase() + u.role.slice(1);
-        const displayStatus = u.status || "Active"; // Default if not in DB yet
+        const displayRole = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : 'Unknown';
+        const displayStatus = u.status || "Active";
 
         row.innerHTML = `
             <td>#${u.id}</td>
@@ -63,20 +165,23 @@ function renderTable(data) {
             <td class="status ${displayStatus.toLowerCase()}">${displayStatus}</td>
             <td style="font-size:0.9rem; color:#777;">${u.lastLogin || 'Never'}</td>
             <td>
-                <button class="action-btn view" onclick="openViewUser(${u.id})"><i class="fa-regular fa-eye"></i></button>
-                <button class="action-btn edit" onclick="openEditUser(${u.id})"><i class="fa-regular fa-pen-to-square"></i></button>
-                <button class="action-btn delete" onclick="openDeleteUser(${u.id})"><i class="fa-regular fa-trash-can"></i></button>
+                <button class="action-btn view" data-id="${u.id}"><i class="fa-regular fa-eye"></i></button>
+                <button class="action-btn edit" data-id="${u.id}"><i class="fa-regular fa-pen-to-square"></i></button>
+                <button class="action-btn delete" data-id="${u.id}"><i class="fa-regular fa-trash-can"></i></button>
             </td>
         `;
         userTableBody.appendChild(row);
     });
 }
 
-// --- Filtering Logic ---
 function applyFilters() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedRole = filterRole.value.toLowerCase();
-    const selectedStatus = filterStatus.value.toLowerCase();
+    const searchInput = document.getElementById("searchUser");
+    const filterRole = document.getElementById("filterRole");
+    const filterStatus = document.getElementById("filterStatus");
+
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+    const selectedRole = filterRole ? filterRole.value.toLowerCase() : "all";
+    const selectedStatus = filterStatus ? filterStatus.value.toLowerCase() : "all";
 
     const filteredUsers = users.filter((user) => {
         const matchesSearch =
@@ -84,13 +189,9 @@ function applyFilters() {
             (user.username && user.username.toLowerCase().includes(searchTerm)) ||
             (user.email && user.email.toLowerCase().includes(searchTerm));
 
-        const matchesRole =
-            selectedRole === "all" || (user.role && user.role.toLowerCase() === selectedRole);
-
-        // Note: Assuming 'Active' as default if status is missing in DB
+        const matchesRole = selectedRole === "all" || (user.role && user.role.toLowerCase() === selectedRole);
         const currentStatus = user.status ? user.status.toLowerCase() : 'active';
-        const matchesStatus =
-            selectedStatus === "all" || currentStatus === selectedStatus;
+        const matchesStatus = selectedStatus === "all" || currentStatus === selectedStatus;
 
         return matchesSearch && matchesRole && matchesStatus;
     });
@@ -98,7 +199,6 @@ function applyFilters() {
     paginateUsers(filteredUsers);
 }
 
-// --- Pagination Logic ---
 function paginateUsers(dataSet) {
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -106,88 +206,35 @@ function paginateUsers(dataSet) {
 
     renderTable(paginatedData);
     
-    // Update Controls
     const totalPages = Math.ceil(dataSet.length / rowsPerPage) || 1;
-    document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
-    document.getElementById("prevPage").disabled = currentPage === 1;
-    document.getElementById("nextPage").disabled = currentPage === totalPages;
+    const pageInfo = document.getElementById("pageInfo");
+    const prevBtn = document.getElementById("prevPage");
+    const nextBtn = document.getElementById("nextPage");
+
+    if(pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    if(prevBtn) prevBtn.disabled = currentPage === 1;
+    if(nextBtn) nextBtn.disabled = currentPage === totalPages;
     
-    // Update Next/Prev Button Logic context
     window.currentDataSetLength = dataSet.length;
 }
 
-// Controls Event Listeners
-searchInput.addEventListener("input", () => { currentPage = 1; applyFilters(); });
-filterRole.addEventListener("change", () => { currentPage = 1; applyFilters(); });
-filterStatus.addEventListener("change", () => { currentPage = 1; applyFilters(); });
-
-document.getElementById("prevPage").addEventListener("click", () => {
-    if (currentPage > 1) { currentPage--; applyFilters(); }
-});
-document.getElementById("nextPage").addEventListener("click", () => {
-    const totalPages = Math.ceil(window.currentDataSetLength / rowsPerPage);
-    if (currentPage < totalPages) { currentPage++; applyFilters(); }
-});
-
-
 // ==========================
-// 3. ADD USER (POST)
+// DYNAMIC MODAL FUNCTIONS (Edit, Delete, View)
 // ==========================
-addUserBtn.addEventListener("click", () => { addUserModal.style.display = "flex"; });
-addUserModal.querySelector(".close-modal").addEventListener("click", () => { addUserModal.style.display = "none"; });
 
-addUserForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    
-    const inputs = addUserForm.querySelectorAll("input, select");
-    const newUser = {
-        name: inputs[0].value,
-        username: inputs[1].value,
-        email: inputs[2].value,
-        password: inputs[3].value,
-        role: inputs[4].value
-    };
-
-    try {
-        const response = await fetch('/api/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newUser)
-        });
-
-        if (response.ok) {
-            alert("User created successfully!");
-            addUserModal.style.display = "none";
-            addUserForm.reset();
-            fetchUsers(); // Refresh table
-        } else {
-            const err = await response.json();
-            alert("Error: " + err.error);
-        }
-    } catch (error) {
-        console.error("Add user failed:", error);
-    }
-});
-
-
-// ==========================
-// 4. EDIT USER (PUT)
-// ==========================
 function openEditUser(id) {
     const user = users.find((u) => u.id === id);
-    if (!editUserModal) createEditModal(); // Create if doesn't exist
+    if (!editUserModal) createEditModal(); 
 
     const form = document.getElementById("editUserFormReal");
     form.dataset.id = id;
 
-    // Populate fields
     form.querySelector("[name='name']").value = user.name;
     form.querySelector("[name='username']").value = user.username;
     form.querySelector("[name='email']").value = user.email;
     form.querySelector("[name='role']").value = user.role.toLowerCase(); 
-    // form.querySelector("[name='status']").value = user.status || 'Active';
 
-    editUserModal.style.display = "flex";
+    openModal(editUserModal);
 }
 
 function createEditModal() {
@@ -212,10 +259,8 @@ function createEditModal() {
     `;
     document.body.appendChild(editUserModal);
     
-    // Close Logic
-    editUserModal.querySelector(".close-modal").onclick = () => editUserModal.style.display = "none";
+    editUserModal.querySelector(".close-modal").onclick = () => closeModal(editUserModal);
     
-    // Submit Logic
     document.getElementById("editUserFormReal").addEventListener("submit", async (e) => {
         e.preventDefault();
         const id = e.target.dataset.id;
@@ -235,8 +280,8 @@ function createEditModal() {
 
             if (response.ok) {
                 alert("User updated!");
-                editUserModal.style.display = "none";
-                fetchUsers(); // Refresh
+                closeModal(editUserModal);
+                fetchUsers(); 
             } else {
                 alert("Update failed");
             }
@@ -244,10 +289,6 @@ function createEditModal() {
     });
 }
 
-
-// ==========================
-// 5. DELETE USER (DELETE)
-// ==========================
 function openDeleteUser(id) {
     const user = users.find((u) => u.id === id);
     if (!deleteUserModal) createDeleteModal();
@@ -255,22 +296,25 @@ function openDeleteUser(id) {
     const deleteText = deleteUserModal.querySelector(".delete-text");
     deleteText.innerHTML = `Are you sure you want to delete <strong>${user.name}</strong>?`;
     
-    // Attach ID to the confirm button
     const confirmBtn = document.getElementById("confirmDeleteBtn");
-    confirmBtn.onclick = async () => {
+    // Fix listener stacking by replacing node
+    const newBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+    
+    newBtn.onclick = async () => {
         try {
             const response = await fetch(`/api/users/${id}`, { method: 'DELETE' });
             if (response.ok) {
                 alert("User deleted.");
-                deleteUserModal.style.display = "none";
-                fetchUsers(); // Refresh
+                closeModal(deleteUserModal);
+                fetchUsers();
             } else {
                 alert("Failed to delete user.");
             }
         } catch (err) { console.error(err); }
     };
 
-    deleteUserModal.style.display = "flex";
+    openModal(deleteUserModal);
 }
 
 function createDeleteModal() {
@@ -289,14 +333,10 @@ function createDeleteModal() {
     `;
     document.body.appendChild(deleteUserModal);
 
-    deleteUserModal.querySelector(".close-modal").onclick = () => deleteUserModal.style.display = "none";
-    deleteUserModal.querySelector(".close-delete").onclick = () => deleteUserModal.style.display = "none";
+    deleteUserModal.querySelector(".close-modal").onclick = () => closeModal(deleteUserModal);
+    deleteUserModal.querySelector(".close-delete").onclick = () => closeModal(deleteUserModal);
 }
 
-
-// ==========================
-// 6. VIEW USER (Read-only)
-// ==========================
 function openViewUser(id) {
     const user = users.find((u) => u.id === id);
     if (!viewUserModal) createViewModal();
@@ -313,7 +353,7 @@ function openViewUser(id) {
             <div><strong>Last Login:</strong> ${user.lastLogin || 'Never'}</div>
         </div>
     `;
-    viewUserModal.style.display = "flex";
+    openModal(viewUserModal);
 }
 
 function createViewModal() {
@@ -329,6 +369,6 @@ function createViewModal() {
     `;
     document.body.appendChild(viewUserModal);
     
-    viewUserModal.querySelector(".close-modal").onclick = () => viewUserModal.style.display = "none";
-    viewUserModal.querySelector(".close-view").onclick = () => viewUserModal.style.display = "none";
+    viewUserModal.querySelector(".close-modal").onclick = () => closeModal(viewUserModal);
+    viewUserModal.querySelector(".close-view").onclick = () => closeModal(viewUserModal);
 }
