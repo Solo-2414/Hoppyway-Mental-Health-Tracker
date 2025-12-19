@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- VARIABLES & ELEMENTS ---
     let activeChatId = null;
     const msgInput = document.getElementById('msg-input');
     const sendBtn = document.getElementById('send-btn');
@@ -10,8 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const activeUserName = document.getElementById('active-user-name');
     const activeUserAvatar = document.getElementById('active-user-avatar');
-    
-    // Dropdown Elements
+
     const searchDropdown = document.getElementById('search-dropdown');
     const searchInput = document.getElementById('user-search-input');
     const searchResults = document.getElementById('search-results');
@@ -19,27 +17,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const contactsList = document.getElementById('contacts-list');
     const noChatsPlaceholder = document.getElementById('no-chats-placeholder');
 
-    // --- 1. SEARCH DROPDOWN LOGIC ---
 
-    // Toggle Dropdown
     newChatBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (searchDropdown.style.display === 'flex') {
-            searchDropdown.style.display = 'none';
-        } else {
-            searchDropdown.style.display = 'flex';
-            searchInput.focus();
-        }
-    });
+    e.stopPropagation();
+    if (searchDropdown.style.display === 'flex') {
+        searchDropdown.style.display = 'none';
+    } else {
+        searchDropdown.style.display = 'flex';
+        searchInput.value = ''; 
+        searchResults.innerHTML = ''; 
+        searchInput.focus();
+    }
+});
 
-    // Close when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!searchDropdown.contains(e.target) && e.target !== newChatBtn) {
-            searchDropdown.style.display = 'none';
-        }
-    });
+document.addEventListener('click', (e) => {
+    if (!searchDropdown.contains(e.target) && e.target !== newChatBtn) {
+        searchDropdown.style.display = 'none';
+    }
+});
 
-    // Live Search API
     searchInput.addEventListener('input', function() {
         const query = this.value.trim();
         if(query.length < 1) {
@@ -64,7 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div style="font-weight:bold; font-size:0.9rem; color:var(--text-color);">${user.name}</div>
                     `;
                     
-                    // ON CLICK: Start Chat + Add to Sidebar
                     div.onclick = () => startNewChat(user.id, user.name);
                     
                     searchResults.appendChild(div);
@@ -72,21 +67,16 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
-    // --- 2. START NEW CHAT (The Fix) ---
     function startNewChat(userId, userName) {
-        // 1. Close Dropdown
         searchDropdown.style.display = 'none';
         searchInput.value = '';
         searchResults.innerHTML = '';
 
-        // 2. Check if user already exists in sidebar
         const existingContact = document.getElementById(`contact-${userId}`);
         
         if (!existingContact) {
-            // Remove "No chats" placeholder if it exists
             if (noChatsPlaceholder) noChatsPlaceholder.style.display = 'none';
 
-            // Create HTML for new contact
             const newContactHTML = `
                 <div class="contact active" id="contact-${userId}" onclick="loadChat(${userId}, '${userName}')">
                     <div class="avatar-circle">${userName.charAt(0)}</div>
@@ -95,32 +85,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 </div>
             `;
-            // Add to top of list
             contactsList.insertAdjacentHTML('afterbegin', newContactHTML);
         }
 
-        // 3. Load the Chat
         loadChat(userId, userName);
     }
 
-    // --- 3. CORE CHAT LOGIC ---
-
-    // Make loadChat global so onclick in HTML works
     window.loadChat = function(userId, userName) {
         activeChatId = userId;
-        
-        // UI Updates
+ 
         chatHeader.style.display = 'flex';
         chatWindow.style.display = 'flex';
         activeUserName.innerText = userName;
         activeUserAvatar.innerText = userName.charAt(0);
-        
-        // Highlight Sidebar Item
+
         document.querySelectorAll('.contact').forEach(el => el.classList.remove('active'));
         const activeContact = document.getElementById(`contact-${userId}`);
         if(activeContact) activeContact.classList.add('active');
 
-        // Fetch Data
         fetchMessages();
     };
 
@@ -131,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(`/api/get_messages/${activeChatId}`);
             const data = await response.json();
             
-            display.innerHTML = ''; // Clear old messages
+            display.innerHTML = '';
             
             if(data.length === 0) {
                 display.innerHTML = `
@@ -148,7 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="timestamp">${msg.time}</span>
                         </div>`;
                 });
-                // Auto scroll to bottom
                 display.scrollTop = display.scrollHeight;
             }
         } catch (error) {
@@ -161,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!text || !activeChatId) return;
 
         try {
-            // Optimistic UI: Append message immediately
             const tempDiv = document.createElement('div');
             tempDiv.className = 'message sent';
             tempDiv.innerHTML = `${text} <span class="timestamp">Just now</span>`;
@@ -169,14 +149,12 @@ document.addEventListener("DOMContentLoaded", () => {
             display.scrollTop = display.scrollHeight;
             msgInput.value = '';
 
-            // Send to Server
             await fetch('/api/send_message', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ receiver_id: activeChatId, message: text })
             });
 
-            // Refresh to get real timestamp/ID
             fetchMessages();
 
         } catch (error) {
@@ -185,7 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Event Listeners
     sendBtn.addEventListener('click', sendMessage);
     msgInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -194,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Polling (Refresh every 3 seconds)
     setInterval(() => {
         if (activeChatId) fetchMessages();
     }, 3000);

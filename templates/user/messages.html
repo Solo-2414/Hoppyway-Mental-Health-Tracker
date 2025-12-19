@@ -15,8 +15,8 @@
             
             <div class="search-dropdown" id="search-dropdown">
                 <div class="search-input-wrapper">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="user-search-input" placeholder="Search people...">
+                    <i class="fa-solid fa-magnifying-glass" style="color:#888;"></i>
+                    <input type="text" id="user-search-input" placeholder="Search people..." autocomplete="off">
                 </div>
                 <div class="search-results" id="search-results"></div>
             </div>
@@ -25,15 +25,16 @@
         <div class="contacts-list" id="contacts-list">
             {% for u in conversations %}
             <div class="contact" id="contact-{{ u.id }}" onclick="loadChat({{ u.id }}, '{{ u.name }}')">
-                <div class="avatar-circle">{{ u.name[0] }}</div>
+                <div class="avatar-circle">{{ u.name[0] | upper }}</div>
                 <div class="contact-info">
                     <h4>{{ u.name }}</h4>
                 </div>
             </div>
             {% else %}
-            <div id="no-chats-placeholder" style="text-align:center; padding:30px; color:var(--grayish-color);">
+            <div id="no-chats-placeholder" style="text-align:center; padding:40px 20px; color:var(--grayish-color);">
+                <i class="fa-regular fa-comments" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
                 <p>No chats yet.</p>
-                <p style="font-size:0.9rem;">Click <b>+</b> to start!</p>
+                <p style="font-size:0.85rem; margin-top:5px;">Click <b>+</b> to start a conversation!</p>
             </div>
             {% endfor %}
         </div>
@@ -48,7 +49,7 @@
 
         <div class="messages-list" id="message-display">
             <div class="empty-state-msg">
-                <i class="fa-regular fa-paper-plane" style="font-size: 3rem; margin-bottom: 10px; opacity:0.3;"></i>
+                <i class="fa-regular fa-paper-plane" style="font-size: 3rem; margin-bottom: 15px; opacity:0.3;"></i>
                 <p>Select a conversation or start a new one</p>
             </div>
         </div>
